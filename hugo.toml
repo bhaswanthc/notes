@@ -1,0 +1,30 @@
+baseURL = 'https://example.org/'
+languageCode = 'en-us'
+title = '乃 | Notes'
+
+# Book configuration
+disablePathToLower = true
+#enableGitInfo = true
+
+[markup.tableOfContents]
+  startLevel = 1
+
+[menu]
+  [[menu.main]]
+    name = "Docs"
+    url = "/docs/"
+    weight = 1
+
+[params]
+    BookTheme = 'dark'
+    BookToC = true
+    BookFavicon = 'favicon.ico'
+    #BookLogo = 'logo.ico'
+    #BookMenuBundle = '/menu'
+    #BookRepo = 'https://github.com/bhaswanthc/notes
+    BookDateFormat = 'January 2, 2006'
+    BookSearch = true
+    #BookComments = true
+    #BookPortableLinks = true
+    #BookServiceWorker = true
+    BookSection = 'docs'
