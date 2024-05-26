@@ -480,7 +480,7 @@ Linux vulnuniversity 4.4.0-142-generic #168-Ubuntu SMP Wed Jan 16 21:00:45 UTC 2
 USER     TTY      FROM             LOGIN@   IDLE   JCPU   PCPU WHAT
 uid=33(www-data) gid=33(www-data) groups=33(www-data)
 /bin/sh: 0: can't access tty; job control turned off
-$ 
+$
 ```
 
 Now that we've got a shell, we need to stabilize the shell as it is unstable.
@@ -497,7 +497,7 @@ Now hit ctrl+z to background it.
 Ctrl + Z
 ```
 
-Set the terminal to raw mode and disables echoing of input characters and foreground the process.
+Set the terminal to raw mode, disable echoing of input characters and foreground the process.
 
 ```shell
 stty raw -echo && fg

@@ -502,7 +502,7 @@ Now hit ctrl+z to background it.
 Ctrl + Z
 ```
 
-Set the terminal to raw mode and disables echoing of input characters and foreground the process.
+Set the terminal to raw mode, disable echoing of input characters and foreground the process.
 
 ```shell
 stty raw -echo && fg

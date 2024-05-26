@@ -9,7 +9,7 @@ menu:
 title: Steel Mountain
 weight: 997
 tags:
-    - Rejetoo
+    - Rejetto
     - HFS
     - Metasploit
     - PowerShell
