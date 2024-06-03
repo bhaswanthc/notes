@@ -1,6 +1,6 @@
 baseURL = 'https://example.org/'
 languageCode = 'en-us'
-title = '乃 | Notes'
+title = 'Notes'
 
 # Book configuration
 disablePathToLower = true
@@ -19,7 +19,7 @@ disablePathToLower = true
     BookTheme = 'dark'
     BookToC = true
     BookFavicon = 'favicon.ico'
-    #BookLogo = 'logo.ico'
+    #BookLogo = 'logo.svg'
     #BookMenuBundle = '/menu'
     #BookRepo = 'https://github.com/bhaswanthc/notes
     BookDateFormat = 'January 2, 2006'
