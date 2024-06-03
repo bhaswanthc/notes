@@ -1,4 +1,6 @@
-baseURL = 'https://example.org/'
+googleAnalytics = "G-NWBJCFBR3S"
+
+baseURL = 'https://www.bhaswanth.in/'
 languageCode = 'en-us'
 title = 'Notes'
 
