@@ -46,7 +46,7 @@ On this website, you can find my write-ups and other security notes.
 
 - Blog - Contains all posts. Recent posts are displayed first.
 - TryHackMe - Contains walkthroughs for TryHackMe rooms.
-- Interview Prep - Contains all posts, with recent posts displayed first.
+- Interview Prep - Contains interview preparation materials focused on security.
 # Social
 
 [Hack The Box](https://app.hackthebox.com/profile/655316) | [HTB Academy](https://drive.google.com/file/d/1wELDvJjQ41WdXO-4evaY8fNqJVEeMrdh/) | [TryHackMe](https://tryhackme.com/p/fireblood) | [LinkedIn](https://www.linkedin.com/in/bhaswanth90702/)
