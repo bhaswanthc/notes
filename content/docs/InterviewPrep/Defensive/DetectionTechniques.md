@@ -336,9 +336,7 @@ weight: 1
 
 6. **Smishing:**
     - **Technique**: Using SMS messages to deceive individuals into revealing information.
-    - **Detection**:
-
- Monitor for suspicious SMS messages and educate users on the risks of sharing information via SMS.
+    - **Detection**: Monitor for suspicious SMS messages and educate users on the risks of sharing information via SMS.
     - **Response**: Block known malicious SMS senders and reinforce policies against sharing sensitive information via SMS.
 
 7. **Shoulder Surfing:**
